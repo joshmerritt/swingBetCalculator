@@ -1,19 +1,8 @@
 import app from 'firebase/app';
 import 'firebase/auth';
+import 'firebase/database';
 
-/*
-const firebaseConfig = {
-  apiKey: "AIzaSyB3WjAf5H56lhBdeL3RCchMJhQ1CSbQhTw",
-  authDomain: "swingbetgolfcalculator.firebaseapp.com",
-  databaseURL: "https://swingbetgolfcalculator.firebaseio.com",
-  projectId: "swingbetgolfcalculator",
-  storageBucket: "swingbetgolfcalculator.appspot.com",
-  messagingSenderId: "285845045987",
-  appId: "1:285845045987:web:932d249ed9a70562"
-};
-*/
-
-const firebaseConfig = {
+const config = {
   apiKey: process.env.REACT_APP_API_KEY,
   authDomain: process.env.REACT_APP_AUTH_DOMAIN,
   databaseURL: process.env.REACT_APP_DATABASE_URL,
@@ -24,9 +13,10 @@ const firebaseConfig = {
 
 class Firebase {
   constructor() {
-    app.initializeApp(firebaseConfig);
+    app.initializeApp(config);
 
     this.auth = app.auth();
+    this.db = app.database();
   }
 
   // *** Auth API ***
@@ -43,6 +33,12 @@ class Firebase {
 
   doPasswordUpdate = password =>
     this.auth.currentUser.updatePassword(password);
+
+  // *** User API ***
+
+  user = uid => this.db.ref(`users/${uid}`);
+
+  users = () => this.db.ref('users');
 }
 
 export default Firebase;
