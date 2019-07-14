@@ -1,8 +1,9 @@
 import React, { Component } from 'react';
 
 import { withFirebase } from '../Firebase';
+import AutoCompleteText from '../AutoCompleteText';
 
-class AdminPage extends Component {
+class Scorecard extends Component {
   constructor(props) {
     super(props);
 
@@ -38,11 +39,9 @@ class AdminPage extends Component {
 
     return (
       <div>
-        <h1>Admin</h1>
+        <h1>Scorecard</h1>
 
-        {loading && <div>Loading ...</div>}
-
-        <UserList users={users} />
+        <AutoCompleteText />
       </div>
     );
   }
@@ -61,12 +60,9 @@ const UserList = ({ users }) => (
         <span>
           <strong>Username:</strong> {user.username}
         </span>
-        <span>
-          <strong>Handicap:</strong> {user.handicap}
-        </span>
       </li>
     ))}
   </ul>
 );
 
-export default withFirebase(AdminPage);
+export default withFirebase(Scorecard);
