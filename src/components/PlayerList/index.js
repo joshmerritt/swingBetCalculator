@@ -5,7 +5,6 @@ import { withFirebase } from '../Firebase';
 class PlayerList extends Component {
   constructor(props) {
     super(props);
-
     this.state = {
       users: [{value: '', display: '(Select player)'}],
       selectedTeam: '',
@@ -13,8 +12,10 @@ class PlayerList extends Component {
   }
 
   componentDidMount() {
+    this.props.firebase.users().on('value', (snapshot) => {
+      console.log(snapshot.val());
+    });
     // this.setState({ loading: true });
-
     // this.props.firebase.users().on('value', snapshot => {
     //   const usersObject = snapshot.val();
     //   const usersList = Object.keys(usersObject).map(key => ({
@@ -38,7 +39,7 @@ class PlayerList extends Component {
 
     return (
       <div>
-        <h1>Scorecard</h1>
+        <h1>Player List</h1>
         <select>
           
         </select>
@@ -47,22 +48,22 @@ class PlayerList extends Component {
   }
 }
 
-const UserList = ({ users }) => (
-  <ul>
-    {users.map(user => (
-      <li key={user.uid}>
-        <span>
-          <strong>ID:</strong> {user.uid}
-        </span>
-        <span>
-          <strong>E-Mail:</strong> {user.email}
-        </span>
-        <span>
-          <strong>Username:</strong> {user.username}
-        </span>
-      </li>
-    ))}
-  </ul>
-);
+// const UserList = ({ users }) => (
+//   <ul>
+//     {users.map(user => (
+//       <li key={user.uid}>
+//         <span>
+//           <strong>ID:</strong> {user.uid}
+//         </span>
+//         <span>
+//           <strong>E-Mail:</strong> {user.email}
+//         </span>
+//         <span>
+//           <strong>Username:</strong> {user.username}
+//         </span>
+//       </li>
+//     ))}
+//   </ul>
+// );
 
 export default withFirebase(Scorecard);
