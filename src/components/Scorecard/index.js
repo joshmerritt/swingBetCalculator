@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 
 import { withFirebase } from '../Firebase';
 import AutoCompleteText from '../AutoCompleteText';
+import Scores from '../Scores';
 
 class Scorecard extends Component {
   constructor(props) {
@@ -40,7 +41,7 @@ class Scorecard extends Component {
       <div>
         <h1>Scorecard</h1>
 
-        <AutoCompleteText /> 
+        <AutoCompleteText />
         <AutoCompleteText />
         <AutoCompleteText /> 
         <AutoCompleteText />

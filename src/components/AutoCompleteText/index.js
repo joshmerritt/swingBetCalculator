@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import { withFirebase } from '../Firebase';
+import Scores from '../Scores';
 
 class AutoCompleteText extends Component {
   constructor (props) {
@@ -45,7 +46,7 @@ class AutoCompleteText extends Component {
       text: value,
       suggestions: [],
     }))
-    
+
   }
 
   renderSuggestions () {
@@ -68,6 +69,7 @@ class AutoCompleteText extends Component {
           <input value={text} onChange={this.onTextChanged} type='text' />
           {this.renderSuggestions()}
         </div>
+ 
       </div>
     )
   }
