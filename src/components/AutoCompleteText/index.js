@@ -45,6 +45,7 @@ class AutoCompleteText extends Component {
       text: value,
       suggestions: [],
     }))
+    
   }
 
   renderSuggestions () {

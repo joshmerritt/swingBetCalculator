@@ -41,6 +41,11 @@ class Scorecard extends Component {
         <h1>Scorecard</h1>
 
         <AutoCompleteText /> 
+        <AutoCompleteText />
+        <AutoCompleteText /> 
+        <AutoCompleteText />
+        <AutoCompleteText /> 
+        <AutoCompleteText />
       </div>
     );
   }
