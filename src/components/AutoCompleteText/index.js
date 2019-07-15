@@ -1,17 +1,32 @@
 import React, { Component } from 'react';
+import { withFirebase } from '../Firebase';
 
 class AutoCompleteText extends Component {
   constructor (props) {
     super(props);
-    this.items = [
-      'Josh',
-      'Hunter',
-      'Tiger',
-    ];
     this.state = {
+      users: [],
       suggestions: [],
       text: '',
     }
+  }
+
+  componentDidMount() {
+    this.props.firebase.users().on('value', snapshot => {
+      const currentUsers = snapshot.val();
+      const playerList = this.state.users;
+      for(let item in currentUsers) {
+        playerList.push(currentUsers[item].username)
+      }
+      this.setState({
+        users: playerList,
+      });
+    });
+    console.log(this.state.users);
+  }
+
+  componentWillUnmount() {
+    this.props.firebase.users().off();
   }
 
   onTextChanged = (event) => {
@@ -19,7 +34,7 @@ class AutoCompleteText extends Component {
     let suggestions = [];
     if(value.length > 0) {
       const regex = new RegExp(`^${value}`, 'i');
-      suggestions = this.items.sort().filter(item => regex.test(item));
+      suggestions = this.state.users.sort().filter(item => regex.test(item));
     }
       this.setState(() =>  ({ suggestions, text: value }));     
       
@@ -47,12 +62,14 @@ class AutoCompleteText extends Component {
   render () {
     const { text } = this.state;
     return (
-      <div>
-        <input value={text} onChange={this.onTextChanged} type='text' />
-        {this.renderSuggestions()}
+      <div className='SelectPlayer'>
+        <div className='AutoCompleteText'>
+          <input value={text} onChange={this.onTextChanged} type='text' />
+          {this.renderSuggestions()}
+        </div>
       </div>
     )
   }
 } 
 
-export default AutoCompleteText;
+export default withFirebase(AutoCompleteText);
