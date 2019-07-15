@@ -6,28 +6,26 @@ class PlayerList extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      users: [{value: '', display: '(Select player)'}],
+      users: [{name: '', display: '(Select player)'}],
       selectedTeam: '',
     };
   }
 
   componentDidMount() {
-    this.props.firebase.users().on('value', (snapshot) => {
-      console.log(snapshot.val());
+    this.props.firebase.users().on('value', snapshot => {
+      const currentUsers = snapshot.val();
+      const playerList = this.state.users;
+      for(let item in currentUsers) {
+        playerList.push({
+          id: item,
+          name: currentUsers[item].username,
+          handicap: currentUsers[item].handicap          
+          })
+      }
+      this.setState({
+        users: playerList,
+      });
     });
-    // this.setState({ loading: true });
-    // this.props.firebase.users().on('value', snapshot => {
-    //   const usersObject = snapshot.val();
-    //   const usersList = Object.keys(usersObject).map(key => ({
-    //     ...usersObject[key],
-    //     uid: key,
-    //   }));
-
-    //   this.setState({
-    //     users: usersList,
-    //     loading: false,
-    //   });
-    // });
   }
 
   componentWillUnmount() {
@@ -38,32 +36,13 @@ class PlayerList extends Component {
     // const { users, loading } = this.state;
 
     return (
+      
       <div>
-        <h1>Player List</h1>
-        <select>
-          
-        </select>
+        {this.state.users}
       </div>
     );
   }
 }
 
-// const UserList = ({ users }) => (
-//   <ul>
-//     {users.map(user => (
-//       <li key={user.uid}>
-//         <span>
-//           <strong>ID:</strong> {user.uid}
-//         </span>
-//         <span>
-//           <strong>E-Mail:</strong> {user.email}
-//         </span>
-//         <span>
-//           <strong>Username:</strong> {user.username}
-//         </span>
-//       </li>
-//     ))}
-//   </ul>
-// );
 
-export default withFirebase(Scorecard);
+export default withFirebase(PlayerList);
