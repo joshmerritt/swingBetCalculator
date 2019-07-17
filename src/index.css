@@ -1,7 +1,6 @@
 body {
   font-family: 'Open Sans', sans-serif;
   background-color: #fff;
-<<<<<<< HEAD
 }
 
 header {
@@ -78,8 +77,6 @@ input {
   border: 0;
   display: block;
   width: 100%;  
-=======
->>>>>>> 1c4884beab7e189c57840e777fc6c392a8507774
 }
 
 header {
@@ -253,86 +250,6 @@ button {
   cursor: pointer;
 }
 
-<<<<<<< HEAD
-h2 {
-  padding: 0;
-  margin: 0;
-  font-weight: 400;
-}
-
-li h3 {
-  background-color: #103D5D;
-  margin: 0;
-  color: #fff;
-  font-weight: 300;
-  padding: 15px;
-}
-
-ul {
-  list-style-type: none;
-  text-align: left;
-}
-
-form button {
-  width: 100%;
-  margin-top: 10px;
-}
-
-button {
-  border-radius: 2px;
-  min-width: 88px;
-  background-color: #FA6900;
-  cursor: pointer;
-  border: 0;
-  min-width: 120px;
-  color: #fff;
-  font-size: 14px;
-  box-shadow: 0 2px 5px 0 rgba(0,0,0,.26);
-  padding: 10px 6px;
-}
-
-.SelectPlayer {
-  margin: auto 0;
-  width: 50%;
-  max-width: 200px;
-}
-
-.AutoCompleteText {
-  height: 100%;
-  max-height: 1.5em;
-  width: 100%;
-  border: 1px solid grey;
-  box-shadow: 0 0 0 1px rgba(0,0,0,.1), 0 2px 4px 1px rgba(0,0,0,.18);
-}
-
-.AutoCompleteText input {
-  height: 1em;
-  width: 100%;
-  border: none;
-  padding: 5px 5px;
-  box-sizing: border-box;
-  outline: none;
-}
-
-.AutoCompleteText ul {
-  list-style-type: none;
-  text-align: left;
-  margin: 0;
-  padding: 0;
-  border-top: 1px solid grey;
-}
-
-.AutoCompleteText ul::before{
-  content: "";
-}
-
-.AutoCompleteText li {
-  padding: 5px 5px;
-  cursor: pointer;
-}
-
-=======
->>>>>>> 1c4884beab7e189c57840e777fc6c392a8507774
 .AutoCompleteText li:hover {
   text-decoration: underline;
   background-color: rgba(128, 128, 128, 0.2);
