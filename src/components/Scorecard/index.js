@@ -2,21 +2,20 @@ import React, { Component } from 'react';
 
 import { withFirebase } from '../Firebase';
 import AutoCompleteText from '../AutoCompleteText';
-import Scores from '../Scores';
+
 
 class Scorecard extends Component {
   constructor(props) {
     super(props);
 
     this.state = {
-      loading: false,
       users: [],
+      players: [],
+      date: new Date(),
     };
   }
 
   componentDidMount() {
-    this.setState({ loading: true });
-
     this.props.firebase.users().on('value', snapshot => {
       const usersObject = snapshot.val();
       const usersList = Object.keys(usersObject).map(key => ({
@@ -26,7 +25,6 @@ class Scorecard extends Component {
 
       this.setState({
         users: usersList,
-        loading: false,
       });
     });
   }
@@ -38,16 +36,7 @@ class Scorecard extends Component {
   render() {
 
     return (
-      <div>
-        <h1>Scorecard</h1>
-
         <AutoCompleteText />
-        <AutoCompleteText />
-        <AutoCompleteText /> 
-        <AutoCompleteText />
-        <AutoCompleteText /> 
-        <AutoCompleteText />
-      </div>
     );
   }
 }

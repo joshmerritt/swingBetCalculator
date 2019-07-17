@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { withFirebase } from '../Firebase';
-import Scores from '../Scores';
+import Firebase from '../Firebase';
 
 class AutoCompleteText extends Component {
   constructor (props) {
@@ -9,21 +9,24 @@ class AutoCompleteText extends Component {
       users: [],
       suggestions: [],
       text: '',
+      playerList: [],
+      loading: true,
     }
+    this.createScorecard = this.createScorecard.bind(this);
   }
 
   componentDidMount() {
     this.props.firebase.users().on('value', snapshot => {
       const currentUsers = snapshot.val();
-      const playerList = this.state.users;
+      const userList = this.state.users;
       for(let item in currentUsers) {
-        playerList.push(currentUsers[item].username)
+        userList.push(currentUsers[item].username)
       }
       this.setState({
-        users: playerList,
+        users: userList,
+        loading: false,
       });
     });
-    console.log(this.state.users);
   }
 
   componentWillUnmount() {
@@ -42,11 +45,15 @@ class AutoCompleteText extends Component {
   }
 
   suggestionSelected (value) {
+    let tempList = this.state.playerList;
+    tempList.push(value);
     this.setState(() => ({
-      text: value,
+      playerList: tempList,
+      player: value,
+      text: '',
       suggestions: [],
     }))
-
+    this.createScorecard = this.createScorecard.bind(this);
   }
 
   renderSuggestions () {
@@ -56,20 +63,55 @@ class AutoCompleteText extends Component {
     }
     return (
       <ul>
-        {suggestions.map((item) => <li onClick={() => this.suggestionSelected(item)}>{item}</li>)}
+        {suggestions.map((item) => <li key={item} onClick={() => this.suggestionSelected(item)}>{item}</li>)}
       </ul>
     )
   }
 
+  renderPlayers () {
+    if (this.state.playerList.length === 0) {
+      return null;
+    }
+    return (
+      <ul>
+        {this.state.playerList.map((item) => <li>{item}</li>)}
+      </ul>
+    )
+  }
+
+  createScorecard (event) {
+    const firebaseRef = Firebase.database().ref().child('First Entry');
+    // console.log('this.props.firebase.db', this.props.firebase.db);
+    // let today = new Date();
+    // event.preventDefault();
+    // this.props.firebase.scorecard().push({
+    //   date: today,
+    // });
+    console.log(firebaseRef);
+    console.log('playerlist', this.playerList);
+    for(let player in this.playerList) {
+      console.log('this.props.firebase.db', this.props.firebase.db);
+      console.log('player', player);
+    }
+  }
+
   render () {
-    const { text } = this.state;
+    const { text, loading } = this.state;
+    if(loading){
+      return <div>Loading Players</div>
+    };
     return (
       <div className='SelectPlayer'>
+        {this.renderPlayers()}
+        <button className='CreateScorecard' onClick={this.createScorecard}>
+          Create Scorecard
+        </button>
+        <br/> <br/>
         <div className='AutoCompleteText'>
-          <input value={text} onChange={this.onTextChanged} type='text' />
-          {this.renderSuggestions()}
+            <input value={text} onChange={this.onTextChanged} type='text' /> 
+            {this.renderSuggestions()}
         </div>
- 
+        <br/>
       </div>
     )
   }

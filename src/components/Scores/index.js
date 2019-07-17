@@ -13,7 +13,7 @@ class Scores extends Component {
 
   onTextChanged = (event) => {
     const value = event.target.value;
-    console.log(value);
+    console.log(event.target, value);
     this.setState(() =>  ({hole1: value}));     
       
   }
