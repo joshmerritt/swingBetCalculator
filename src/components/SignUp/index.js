@@ -14,6 +14,7 @@ const SignUpPage = () => (
 const INITIAL_STATE = {
   username: '',
   email: '',
+  handicap: '',
   passwordOne: '',
   passwordTwo: '',
   error: null,
@@ -27,7 +28,7 @@ class SignUpFormBase extends Component {
   }
 
   onSubmit = event => {
-    const { username, email, passwordOne } = this.state;
+    const { username, email, handicap, passwordOne } = this.state;
 
     this.props.firebase
       .doCreateUserWithEmailAndPassword(email, passwordOne)
@@ -38,6 +39,7 @@ class SignUpFormBase extends Component {
           .set({
             username,
             email,
+            handicap,
           })
           .then(() => {
             this.setState({ ...INITIAL_STATE });
@@ -62,6 +64,7 @@ class SignUpFormBase extends Component {
     const {
       username,
       email,
+      handicap,
       passwordOne,
       passwordTwo,
       error,
@@ -71,7 +74,8 @@ class SignUpFormBase extends Component {
       passwordOne !== passwordTwo ||
       passwordOne === '' ||
       email === '' ||
-      username === '';
+      username === '' ||
+      handicap === '';
 
     return (
       <form onSubmit={this.onSubmit}>
@@ -82,6 +86,7 @@ class SignUpFormBase extends Component {
           type="text"
           placeholder="Full Name"
         />
+        <br></br>
         <input
           name="email"
           value={email}
@@ -89,6 +94,16 @@ class SignUpFormBase extends Component {
           type="text"
           placeholder="Email Address"
         />
+        <br></br>
+        <input
+          name="handicap"
+          value={handicap}
+          onChange={this.onChange}
+          type="number"
+          placeholder="handicap"
+        />
+        <br></br>
+        <br></br>
         <input
           name="passwordOne"
           value={passwordOne}
@@ -96,6 +111,7 @@ class SignUpFormBase extends Component {
           type="password"
           placeholder="Password"
         />
+        <br></br>
         <input
           name="passwordTwo"
           value={passwordTwo}
@@ -103,6 +119,7 @@ class SignUpFormBase extends Component {
           type="password"
           placeholder="Confirm Password"
         />
+        <br></br>
         <button disabled={isInvalid} type="submit">
           Sign Up
         </button>
