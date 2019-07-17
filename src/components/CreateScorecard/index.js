@@ -1,8 +1,10 @@
 import React, { Component } from 'react';
 import { withFirebase } from '../Firebase';
+import * as ROUTES from '../../constants/routes';
+import { withRouter } from 'react-router-dom';
 
 
-class CreateNewScorecard extends Component {
+class CreateScorecard extends Component {
   constructor (props) {
     super(props);
     this.state = {
@@ -12,7 +14,7 @@ class CreateNewScorecard extends Component {
       playerList: [],
       loading: true,
     }
-    this.createScorecard = this.createScorecard.bind(this);
+    this.createNewScorecard = this.createNewScorecard.bind(this);
   }
 
   componentDidMount() {
@@ -79,7 +81,8 @@ class CreateNewScorecard extends Component {
     )
   }
 
-  createScorecard (event) {
+  createNewScorecard (event) {
+    event.preventDefault();
     let today = new Date();
     today = today.toString();
     let newRecord = this.props.firebase.db.ref('scorecards/').push();
@@ -88,6 +91,7 @@ class CreateNewScorecard extends Component {
       players: this.state.playerList,
     };
     newRecord.set(newItem);
+    this.props.history.push(ROUTES.SCORECARD);
   }
 
   render () {
@@ -98,10 +102,13 @@ class CreateNewScorecard extends Component {
     return (
       <div className='SelectPlayer'>
         {this.renderPlayers()}
-        <button className='CreateScorecard' onClick={this.createScorecard}>
-          Create Scorecard
+        <h6>Press "Create Scorecard" when finished entering players.</h6>
+        <button className='CreateScorecard' onClick={this.createNewScorecard}>
+          Create Scorecard 
         </button>
         <br/> <br/>
+        <h4>Enter Player Names</h4>
+        
         <div className='AutoCompleteText'>
             <input value={text} onChange={this.onTextChanged} type='text' /> 
             {this.renderSuggestions()}
@@ -112,4 +119,4 @@ class CreateNewScorecard extends Component {
   }
 } 
 
-export default withFirebase(CreateNewScorecard);
+export default withRouter(withFirebase(CreateScorecard));

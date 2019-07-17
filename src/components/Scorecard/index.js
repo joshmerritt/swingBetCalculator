@@ -1,7 +1,6 @@
 import React, { Component } from 'react';
 
 import { withFirebase } from '../Firebase';
-import CreateNewScorecard from '../CreateNewScorecard';
 
 
 class Scorecard extends Component {
@@ -11,7 +10,7 @@ class Scorecard extends Component {
     this.state = {
       users: [],
       players: [],
-      date: new Date(),
+      scorecard: [],
     };
   }
 
@@ -22,15 +21,25 @@ class Scorecard extends Component {
         ...usersObject[key],
         uid: key,
       }));
-
       this.setState({
         users: usersList,
+      });
+    });
+    this.props.firebase.scorecards().once('value', snapshot => {
+      const scorecardObject = snapshot.val();
+      const scorecardList = Object.keys(scorecardObject).map(key => ({
+        ...scorecardObject[key],
+        uid: key,
+      }));
+      let lastScorecard = scorecardList[scorecardList.length-1];
+      this.setState({
+        scorecard: lastScorecard,
       });
     });
   }
 
   componentWillUnmount() {
-    this.props.firebase.users().off();
+    this.props.firebase.scorecards().off();
   }
 
   render() {
@@ -39,7 +48,6 @@ class Scorecard extends Component {
       <div>
       
         <h1>Scorecard</h1>
-        <CreateNewScorecard />
       </div>
     );
   }

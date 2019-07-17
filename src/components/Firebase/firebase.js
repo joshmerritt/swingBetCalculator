@@ -40,7 +40,9 @@ class Firebase {
 
   users = () => this.db.ref('users');
 
-  createScorecard = (players) => this.db.ref('players');
+  scorecards = () => this.db.ref('scorecards');
+
+
 }
 
 export default Firebase;
