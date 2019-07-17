@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 
 import { withFirebase } from '../Firebase';
-import AutoCompleteText from '../AutoCompleteText';
+import CreateNewScorecard from '../CreateNewScorecard';
 
 
 class Scorecard extends Component {
@@ -36,7 +36,7 @@ class Scorecard extends Component {
   render() {
 
     return (
-        <AutoCompleteText />
+        <CreateNewScorecard />
     );
   }
 }

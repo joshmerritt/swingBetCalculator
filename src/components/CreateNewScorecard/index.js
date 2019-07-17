@@ -1,8 +1,8 @@
 import React, { Component } from 'react';
 import { withFirebase } from '../Firebase';
-import Firebase from '../Firebase';
 
-class AutoCompleteText extends Component {
+
+class CreateNewScorecard extends Component {
   constructor (props) {
     super(props);
     this.state = {
@@ -22,6 +22,7 @@ class AutoCompleteText extends Component {
       for(let item in currentUsers) {
         userList.push(currentUsers[item].username)
       }
+      console.log('this.state', this.state);
       this.setState({
         users: userList,
         loading: false,
@@ -53,7 +54,6 @@ class AutoCompleteText extends Component {
       text: '',
       suggestions: [],
     }))
-    this.createScorecard = this.createScorecard.bind(this);
   }
 
   renderSuggestions () {
@@ -74,25 +74,20 @@ class AutoCompleteText extends Component {
     }
     return (
       <ul>
-        {this.state.playerList.map((item) => <li>{item}</li>)}
+        {this.state.playerList.map((item) => <li key={item}>{item}</li>)}
       </ul>
     )
   }
 
   createScorecard (event) {
-    const firebaseRef = Firebase.database().ref().child('First Entry');
-    // console.log('this.props.firebase.db', this.props.firebase.db);
-    // let today = new Date();
-    // event.preventDefault();
-    // this.props.firebase.scorecard().push({
-    //   date: today,
-    // });
-    console.log(firebaseRef);
-    console.log('playerlist', this.playerList);
-    for(let player in this.playerList) {
-      console.log('this.props.firebase.db', this.props.firebase.db);
-      console.log('player', player);
-    }
+    let today = new Date();
+    today = today.toString();
+    let newRecord = this.props.firebase.db.ref('scorecards/').push();
+    let newItem = {
+      dateOfRound: today,
+      players: this.state.playerList,
+    };
+    newRecord.set(newItem);
   }
 
   render () {
@@ -117,4 +112,4 @@ class AutoCompleteText extends Component {
   }
 } 
 
-export default withFirebase(AutoCompleteText);
+export default withFirebase(CreateNewScorecard);
