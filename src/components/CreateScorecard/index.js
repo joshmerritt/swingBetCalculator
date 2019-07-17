@@ -94,6 +94,35 @@ class CreateScorecard extends Component {
     this.props.history.push(ROUTES.SCORECARD);
   }
 
+  createNewCourse (){
+    let newCourse = this.props.firebase.db.ref('courses/').push();
+    let newItem = {
+      name: 'Sunset',
+      holes: [
+        {name: 'Hole1', par: 4, handicap: 11},
+        {name: 'Hole2', par: 3, handicap: 13},
+        {name: 'Hole3', par: 4, handicap: 17},
+        {name: 'Hole4', par: 4, handicap: 3},
+        {name: 'Hole5', par: 5, handicap: 15},
+        {name: 'Hole6', par: 3, handicap: 9},
+        {name: 'Hole7', par: 4, handicap: 5},
+        {name: 'Hole8', par: 4, handicap: 1},
+        {name: 'Hole9', par: 5, handicap: 7},
+        {name: 'Hole10', par: 4, handicap: 16},
+        {name: 'Hole11', par: 3, handicap: 10},
+        {name: 'Hole12', par: 5, handicap: 6},
+        {name: 'Hole13', par: 4, handicap: 14},
+        {name: 'Hole14', par: 4, handicap: 4},
+        {name: 'Hole15', par: 4, handicap: 8},
+        {name: 'Hole16', par: 3, handicap: 18},
+        {name: 'Hole17', par: 5, handicap: 12},
+        {name: 'Hole18', par: 4, handicap: 2},
+      ],
+    };
+    newCourse.set(newItem);
+    this.props.history.push(ROUTES.SCORECARD);
+  }
+
   render () {
     const { text, loading } = this.state;
     if(loading){

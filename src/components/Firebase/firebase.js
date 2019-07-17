@@ -42,6 +42,10 @@ class Firebase {
 
   scorecards = () => this.db.ref('scorecards');
 
+  scorecard = uid => this.db.ref(`scorecards/${uid}`);
+
+  courses = () => this.db.ref('courses');
+
 
 }
 

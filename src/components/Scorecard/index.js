@@ -11,6 +11,7 @@ class Scorecard extends Component {
       users: [],
       players: [],
       scorecard: [],
+      course: [],
     };
   }
 
@@ -34,12 +35,28 @@ class Scorecard extends Component {
       let lastScorecard = scorecardList[scorecardList.length-1];
       this.setState({
         scorecard: lastScorecard,
+        players: lastScorecard.players,
+      });
+    });
+    this.props.firebase.courses().once('value', snapshot => {
+      const coursesObject = snapshot.val();
+      const coursesList = Object.keys(coursesObject).map(key => ({
+        ...coursesObject[key],
+        uid: key,
+      }));
+      let lastCourse = coursesList[coursesList.length-1];
+      this.setState({
+        course: lastCourse,
       });
     });
   }
 
+  updatePlayerData() {
+    
+  }
+
   componentWillUnmount() {
-    this.props.firebase.scorecards().off();
+    this.props.firebase.users().off();
   }
 
   render() {
