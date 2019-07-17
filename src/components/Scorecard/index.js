@@ -36,7 +36,11 @@ class Scorecard extends Component {
   render() {
 
     return (
+      <div>
+      
+        <h1>Scorecard</h1>
         <CreateNewScorecard />
+      </div>
     );
   }
 }
