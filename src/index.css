@@ -111,8 +111,9 @@ li h3 {
   padding: 15px;
 }
 
-li p {
-  padding: 15px;
+ul {
+  list-style-type: none;
+  text-align: left;
 }
 
 form button {
@@ -134,7 +135,7 @@ button {
 }
 
 .SelectPlayer {
-  margin: 150px auto 0 auto;
+  margin: auto 0;
   width: 50%;
   max-width: 200px;
 }
@@ -151,7 +152,7 @@ button {
   height: 1em;
   width: 100%;
   border: none;
-  padding: 10px 5px;
+  padding: 5px 5px;
   box-sizing: border-box;
   outline: none;
 }
@@ -169,7 +170,7 @@ button {
 }
 
 .AutoCompleteText li {
-  padding: 10px 5px;
+  padding: 5px 5px;
   cursor: pointer;
 }
 

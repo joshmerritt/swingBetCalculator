@@ -19,9 +19,6 @@ const Navigation = () => (
 const NavigationAuth = () => (
   <ul>
     <li>
-      <Link to={ROUTES.SCORECARD}>New Scorecard</Link>
-    </li>
-    <li>
       <Link to={ROUTES.LANDING}>Landing</Link>
     </li>
     <li>
@@ -32,6 +29,9 @@ const NavigationAuth = () => (
     </li>
     <li>
       <Link to={ROUTES.ADMIN}>Admin</Link>
+    </li>
+    <li>
+      <Link to={ROUTES.SCORECARD}>New Scorecard</Link>
     </li>
     <li>
       <SignOutButton />
