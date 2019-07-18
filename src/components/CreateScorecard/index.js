@@ -24,7 +24,6 @@ class CreateScorecard extends Component {
       for(let item in currentUsers) {
         userList.push(currentUsers[item].username)
       }
-      console.log('this.state', this.state);
       this.setState({
         users: userList,
         loading: false,
@@ -90,6 +89,10 @@ class CreateScorecard extends Component {
       dateOfRound: today,
       players: this.state.playerList,
     };
+    this.setState({
+      scorecard: newRecord,
+    });
+    console.log('this.state', this.state);
     newRecord.set(newItem);
     this.props.history.push(ROUTES.SCORECARD);
   }
@@ -120,7 +123,6 @@ class CreateScorecard extends Component {
       ],
     };
     newCourse.set(newItem);
-    this.props.history.push(ROUTES.SCORECARD);
   }
 
   render () {
