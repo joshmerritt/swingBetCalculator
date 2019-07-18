@@ -16,6 +16,7 @@ class Scorecard extends Component {
     };
   this.updatePlayerData = this.updatePlayerData.bind(this);
   this.onHandicapChange = this.onHandicapChange.bind(this);
+  this.onScoreChange = this.onScoreChange.bind(this);
   }
 
   componentDidMount() {
@@ -58,7 +59,6 @@ class Scorecard extends Component {
   }
 
   updatePlayerData() {
-    console.log('scorecard uid', this.state.scorecard.uid);
     let playersTemp = [];
     let holes = [
       {name: 'hole1', score: ''}, {name: 'hole2', score: ''}, {name: 'hole3', score: ''}, 
@@ -85,16 +85,6 @@ class Scorecard extends Component {
     this.props.firebase.users().off();
   }
 
-  // renderHoles() {
-  //   console.log(this.state.scorecard);
-  //   return (
-  //     <input>this</input>
-  //    {{this.state.scorecard.players[player.uid].holes.map((hole)=> {
-  //          <input className="scores" name="scores" value={hole} type='number'/>
-  //    })}}
-  //   )
-  // }
-
   onHandicapChange = event => {
     const value = event.target.value;
     if(value >= 0) {
@@ -112,53 +102,33 @@ class Scorecard extends Component {
   };
 
   onScoreChange = event => {
-    console.log(event.target);
     const value = event.target.value;
     let tempValues = event.target.id.split(' ');
-    console.log('tempValues', tempValues);
     const nameLength = tempValues.length - 1;
-    let hole = tempValues[nameLength];
+    const holeName = tempValues[nameLength];
     let playerName = '';
-    console.log('hole', hole);
-    console.log('playerName', playerName);
     for(let i=0; i < nameLength; i++) {
-      playerName = playerName + tempValues[i];
+      playerName += tempValues[i];
+      if(i < (nameLength -1)) playerName += " ";
     }
-    console.log('playerName2', playerName);
-    console.log('tempvalue',tempValues);
-    console.log(value);
-    console.log('this.state', this.state);
     if(value >= 0) {
-      const tempId = event.target.id;
       let players = this.state.scorecard.players;
       let playersIndex = '';
       let player = players.find(function(item, index) {
         playersIndex = index;
-        return tempId === item.uid
+        return playerName === item.username
       });
-      // player.handicap = event.target.value;
-      // players[playersIndex] = player;
-      // this.setState({players: players});
+      let holes = player.holes;
+      let holeIndex = '';
+      holes.find(function(item, index){
+        holeIndex = index;
+        return holeName === item.name
+      })
+      player.holes[holeIndex].score = value;
+      players[playersIndex] = player;
+      this.setState({players: players});
     };
   };
-
-  // onTextChanged = (event) => {
-  //   const value = event.target.value;
-  //   let suggestions = [];
-  //   if(value.length > 0) {
-  //     const regex = new RegExp(`^${value}`, 'i');
-  //     suggestions = this.state.users.sort().filter(item => regex.test(item));
-  //   }
-  //     this.setState(() =>  ({ suggestions, text: value }));     
-  // }
-
-  // renderHoles(player) {
-  //   console.log('renderHoles player', player)
-  //   player.holes.map(item => {
-  //     console.log(this);
-  //     return <td><input className="hole" id={player.uid} name={player.name} value={player.handicap} onChange={this.onHandicapChange} type="number"/></td>
-  //   });
-  // };
 
   render() {
     if(this.state.loading){
@@ -177,6 +147,7 @@ class Scorecard extends Component {
             <tr>
               <th>Player</th>
               <th>Handicap</th>
+              <th>Swinger?</th>
               <th>1</th>
               <th>2</th>
               <th>3</th>
@@ -205,12 +176,14 @@ class Scorecard extends Component {
                   <td>
                     <input className="handicap" id={player.uid} name={player.name} value={player.handicap} onChange={this.onHandicapChange} type="number"/>
                   </td>
+                  <td>
+                    <input type="checkbox" name={player.username} value="false"/>
+                  </td>
                   {player.holes.map((item, index) => {
                     let playerHole = player.username + " " + item.name;
-                    console.log(index);
                     return (
                       <td key={playerHole}>
-                        <input className="hole" id={playerHole} name={player.name} value={item.score} onChange={this.onScoreChange} type="number"/>
+                        <input className="hole" id={playerHole} name={player.username} value={item.score} onChange={this.onScoreChange} type="number"/>
                       </td>
                     )
                   })}
