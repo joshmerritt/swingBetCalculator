@@ -15,6 +15,7 @@ class Scorecard extends Component {
       loading: true,
     };
   this.updatePlayerData = this.updatePlayerData.bind(this);
+  this.onHandicapChange = this.onHandicapChange.bind(this);
   }
 
   componentDidMount() {
@@ -39,7 +40,9 @@ class Scorecard extends Component {
           scorecard: lastScorecard,
           players: lastScorecard.players,
         });
-        this.setState({loading: false});
+        if(lastScorecard.players[0].uid) {
+          this.setState({loading: false});
+        }
       });
       this.props.firebase.courses().once('value', snapshot => {
         const coursesObject = snapshot.val();
@@ -58,12 +61,12 @@ class Scorecard extends Component {
     console.log('scorecard uid', this.state.scorecard.uid);
     let playersTemp = [];
     let holes = [
-      {hole1: ''}, {hole2: ''}, {hole3: ''}, 
-      {hole4: ''}, {hole5: ''}, {hole6: ''}, 
-      {hole7: ''}, {hole8: ''}, {hole9: ''},
-      {hole10: ''}, {hole11: ''}, {hole12: ''}, 
-      {hole13: ''}, {hole14: ''}, {hole15: ''}, 
-      {hole16: ''}, {hole17: ''}, {hole18: ''},
+      {name: 'hole1', score: ''}, {name: 'hole2', score: ''}, {name: 'hole3', score: ''}, 
+      {name: 'hole4', score: ''}, {name: 'hole5', score: ''}, {name: 'hole6', score: ''}, 
+      {name: 'hole7', score: ''}, {name: 'hole8', score: ''}, {name: 'hole9', score: ''},
+      {name: 'hole10', score: ''}, {name: 'hole11', score: ''}, {name: 'hole12', score: ''}, 
+      {name: 'hole13', score: ''}, {name: 'hole14', score: ''}, {name: 'hole15', score: ''}, 
+      {name: 'hole16', score: ''}, {name: 'hole17', score: ''}, {name: 'hole18', score: ''},
     ];
     for (let i = 0; i < this.state.scorecard.players.length; i++) {
       let tempPlayer = this.state.scorecard.players[i];
@@ -75,6 +78,7 @@ class Scorecard extends Component {
     scorecardTemp.set({
       players: playersTemp,
     });
+    this.setState({loading: false});
   }
 
   componentWillUnmount() {
@@ -92,16 +96,50 @@ class Scorecard extends Component {
   // }
 
   onHandicapChange = event => {
-    const tempId = event.target.id;
-    let players = this.state.scorecard.players;
-    let playersIndex = '';
-    let player = players.find(function(item, index) {
-      playersIndex = index;
-      return tempId === item.uid
-    });
-    player.handicap = event.target.value;
-    players[playersIndex] = player;
-    this.setState({players: players});
+    const value = event.target.value;
+    if(value >= 0) {
+      const tempId = event.target.id;
+      let players = this.state.scorecard.players;
+      let playersIndex = '';
+      let player = players.find(function(item, index) {
+        playersIndex = index;
+        return tempId === item.uid
+      });
+      player.handicap = event.target.value;
+      players[playersIndex] = player;
+      this.setState({players: players});
+    };
+  };
+
+  onScoreChange = event => {
+    console.log(event.target);
+    const value = event.target.value;
+    let tempValues = event.target.id.split(' ');
+    console.log('tempValues', tempValues);
+    const nameLength = tempValues.length - 1;
+    let hole = tempValues[nameLength];
+    let playerName = '';
+    console.log('hole', hole);
+    console.log('playerName', playerName);
+    for(let i=0; i < nameLength; i++) {
+      playerName = playerName + tempValues[i];
+    }
+    console.log('playerName2', playerName);
+    console.log('tempvalue',tempValues);
+    console.log(value);
+    console.log('this.state', this.state);
+    if(value >= 0) {
+      const tempId = event.target.id;
+      let players = this.state.scorecard.players;
+      let playersIndex = '';
+      let player = players.find(function(item, index) {
+        playersIndex = index;
+        return tempId === item.uid
+      });
+      // player.handicap = event.target.value;
+      // players[playersIndex] = player;
+      // this.setState({players: players});
+    };
   };
 
   // onTextChanged = (event) => {
@@ -112,12 +150,24 @@ class Scorecard extends Component {
   //     suggestions = this.state.users.sort().filter(item => regex.test(item));
   //   }
   //     this.setState(() =>  ({ suggestions, text: value }));     
-      
   // }
+
+  // renderHoles(player) {
+  //   console.log('renderHoles player', player)
+  //   player.holes.map(item => {
+  //     console.log(this);
+  //     return <td><input className="hole" id={player.uid} name={player.name} value={player.handicap} onChange={this.onHandicapChange} type="number"/></td>
+  //   });
+  // };
 
   render() {
     if(this.state.loading){
-      return <h2>Loading...</h2>
+      return (
+        <div>
+          <h2>Loading...</h2>
+          <button onClick={this.updatePlayerData}>Update Player Data</button>
+        </div>
+      )
     };
     return (
       <div className="scorecard">
@@ -127,7 +177,7 @@ class Scorecard extends Component {
             <tr>
               <th>Player</th>
               <th>Handicap</th>
-              <th>Hole: 1</th>
+              <th>1</th>
               <th>2</th>
               <th>3</th>
               <th>4</th>
@@ -155,12 +205,20 @@ class Scorecard extends Component {
                   <td>
                     <input className="handicap" id={player.uid} name={player.name} value={player.handicap} onChange={this.onHandicapChange} type="number"/>
                   </td>
+                  {player.holes.map((item, index) => {
+                    let playerHole = player.username + " " + item.name;
+                    console.log(index);
+                    return (
+                      <td key={playerHole}>
+                        <input className="hole" id={playerHole} name={player.name} value={item.score} onChange={this.onScoreChange} type="number"/>
+                      </td>
+                    )
+                  })}
                 </tr>
               )
             })}
           </tbody>
-        </table>
-        <button onClick={this.updatePlayerData}>Update Player Data</button>
+        </table>       
       </div>
     );
   }

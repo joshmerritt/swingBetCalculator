@@ -166,3 +166,7 @@ button {
 .handicap {
   max-width: 50px;
 }
+
+.scorecard table td {
+  border: 1px solid grey;
+}
