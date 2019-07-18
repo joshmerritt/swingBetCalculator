@@ -83,8 +83,28 @@ class Scorecard extends Component {
     this.props.firebase.users().off();
   }
 
-  renderHoles() {
-    
+  // renderHoles() {
+  //   console.log(this.state.scorecard);
+  //   return (
+  //     <input>this</input>
+  //   )
+  // }
+
+  // onChange(event) => {
+  //   const value = event.target.value;
+  //   const player = "Josh Merritt"
+  //   this.setState(() => {scorecard.player.handicap})
+  // }
+
+  onTextChanged = (event) => {
+    const value = event.target.value;
+    let suggestions = [];
+    if(value.length > 0) {
+      const regex = new RegExp(`^${value}`, 'i');
+      suggestions = this.state.users.sort().filter(item => regex.test(item));
+    }
+      this.setState(() =>  ({ suggestions, text: value }));     
+      
   }
 
   render() {
@@ -95,27 +115,27 @@ class Scorecard extends Component {
       <div>
       
         <h1>Scorecard</h1>
-        <ul>
-          {this.state.scorecard.players.map((player) => {
-            return (
-              <li key={player.uid}>
-                {player.username} 
-                <br/>:: 
-                <label>
-                  Handicap:: <input className="handicap" name="handicap" value={player.handicap} onChange={this.onChange} type="number"/>
-                </label>
-                {/* {this.state.scorecard.players[player.uid].holes.map((hole) => {
-
-                })} */}
-              </li>
-            )
-          })}
-        </ul>
+        <table>
+          <tbody>
+            {this.state.scorecard.players.map((player) => {
+              return (
+                <tr key={player.uid}>
+                  {player.username} 
+                  <input className="handicap" name="handicap" value={player.handicap} onChange={this.onChange} type="number"/>
+                  {/* {this.state.scorecard.players[player.uid].holes.map((hole)=> {
+                    <input className="scores" name="scores" value={hole} type='number'/>
+                  })} */}
+                </tr>
+              )
+            })}
+          </tbody>
+        </table>
         <button onClick={this.updatePlayerData}> Update Player Data </button>
       </div>
     );
   }
 }
+
 
 
 export default withFirebase(Scorecard);
