@@ -104,7 +104,7 @@ class Scorecard extends Component {
         playersIndex = index;
         return tempId === item.uid
       });
-      player.handicap = event.target.value;
+      player.handicap = Number(event.target.value);
       players[playersIndex] = player;
       this.setState({players: players});
     };
@@ -140,17 +140,14 @@ class Scorecard extends Component {
   }
 
   updateSwingers = event => {
-    console.log('updateSwings event target', event.target);
     const playerName = event.target.name;
     let players = this.state.scorecard.players;
     let playersIndex = '';
     let player = players.find(function(item, index) {
-      console.log('playerName : username : index', playerName, " : ", item.username, " : ", index);
+      //console.log('playerName : username : index', playerName, " : ", item.username, " : ", index);
       playersIndex = index;
       return playerName === item.username
     });
-    console.log(player);
-    console.log(event.target.value);
     player.swinger = !player.swinger;
     players[playersIndex] = player;
     this.setState({players: players});
@@ -160,9 +157,36 @@ class Scorecard extends Component {
   saveScorecard = event => {
     const currentScorecardKey = this.state.scorecard.uid;
     let newRecord = this.props.firebase.db.ref('scorecards/' + currentScorecardKey);
-    newRecord.set(this.state.scorecard.players);
-    this.props.history.push(ROUTES.HOME);
+    newRecord.set(this.state.scorecard);
     event.preventDefault();
+    this.calculateScores();
+//    this.props.history.push(ROUTES.HOME);
+  }
+
+  calculateScores() {
+    this.createMatchups();
+  }
+
+  createMatchups() {
+    let matchups = [];
+    const playersTemp = this.state.scorecard.players;
+    let swingers = playersTemp.filter(player => player.swinger);
+    let opponents = playersTemp.filter(player => !player.swinger);
+    const numOpps = opponents.length;
+    console.log('opps', opponents);
+    console.log('swingers', swingers);
+    for(let i = 0; i < numOpps; i++) {
+      for(let j = i+1; j<numOpps; j++) {
+        let thisMatchup = {players: [swingers[0].uid, swingers[1].uid], result:''};
+        thisMatchup.players.push(opponents[i].uid);
+        thisMatchup.players.push(opponents[j].uid);
+        console.log('thisMatchup', thisMatchup);
+        matchups.push(thisMatchup);
+      }
+    }
+    console.log('matchups',matchups);
+    
+
   }
 
   render() {
