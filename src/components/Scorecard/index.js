@@ -64,6 +64,10 @@ class Scorecard extends Component {
       });
   }
 
+  componentWillUnmount() {
+    this.props.firebase.off();
+  }
+
   /* Create Holes array to hold each players scores */
   updatePlayerData() {
     let playersTemp = [];
@@ -88,9 +92,6 @@ class Scorecard extends Component {
     this.setState({loading: false});
   }
 
-  componentWillUnmount() {
-    this.props.firebase.off();
-  }
 
   onHandicapChange = event => {
     const value = event.target.value;
