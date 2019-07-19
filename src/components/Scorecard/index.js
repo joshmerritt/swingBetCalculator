@@ -165,9 +165,11 @@ class Scorecard extends Component {
 
   calculateScores() {
     this.createMatchups();
+    
   }
 
   createMatchups() {
+    let thisScorecard = this.state.scorecard;
     let matchups = [];
     const playersTemp = this.state.scorecard.players;
     let swingers = playersTemp.filter(player => player.swinger);
@@ -185,8 +187,8 @@ class Scorecard extends Component {
       }
     }
     console.log('matchups',matchups);
-    
-
+    thisScorecard.matchups = matchups;
+    this.setState({scorecard: thisScorecard});
   }
 
   render() {
