@@ -46,7 +46,7 @@ class Firebase {
 
   courses = () => this.db.ref('courses');
 
-  off = () => this.db.ref.off();
+  off = () => this.db.off();
 
 }
 

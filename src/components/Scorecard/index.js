@@ -22,6 +22,7 @@ class Scorecard extends Component {
   this.onHandicapChange = this.onHandicapChange.bind(this);
   this.onScoreChange = this.onScoreChange.bind(this);
   this.saveScorecard = this.saveScorecard.bind(this);
+  this.updateSwingers = this.updateSwingers.bind(this);
   }
 
   /* Load user list, most recent scorecard, and course */
@@ -93,7 +94,6 @@ class Scorecard extends Component {
     this.setState({loading: false});
   }
 
-
   onHandicapChange = event => {
     const value = event.target.value;
     if(value >= 0) {
@@ -139,12 +139,30 @@ class Scorecard extends Component {
     };
   }
 
-  saveScorecard(event) {
-    event.preventDefault();
+  updateSwingers = event => {
+    console.log('updateSwings event target', event.target);
+    const playerName = event.target.name;
+    let players = this.state.scorecard.players;
+    let playersIndex = '';
+    let player = players.find(function(item, index) {
+      console.log('playerName : username : index', playerName, " : ", item.username, " : ", index);
+      playersIndex = index;
+      return playerName === item.username
+    });
+    console.log(player);
+    console.log(event.target.value);
+    player.swinger = !player.swinger;
+    players[playersIndex] = player;
+    this.setState({players: players});
+  };
+
+
+  saveScorecard = event => {
     const currentScorecardKey = this.state.scorecard.uid;
     let newRecord = this.props.firebase.db.ref('scorecards/' + currentScorecardKey);
     newRecord.set(this.state.scorecard.players);
     this.props.history.push(ROUTES.HOME);
+    event.preventDefault();
   }
 
   render() {
@@ -201,7 +219,7 @@ class Scorecard extends Component {
                       <input className="handicap" id={player.uid} name={player.name} value={player.handicap} onChange={this.onHandicapChange} type="number"/>
                     </td>
                     <td>
-                      <input type="checkbox" name={player.username} value="false"/>
+                      <input type="checkbox" name={player.username} onChange={this.updateSwingers} checked={!!player.swinger}/>
                     </td>
                     {player.holes.map((item, index) => {
                       let playerHole = player.username + " " + item.name;

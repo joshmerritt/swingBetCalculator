@@ -1,153 +1,137 @@
 import React, { Component } from 'react';
-import { withFirebase } from '../Firebase';
 import * as ROUTES from '../../constants/routes';
-import { withRouter } from 'react-router-dom';
+import { withFirebase } from '../Firebase';
 
+/* 
+  Calculates the scores for the given scorecard.
+
+  
+*/
 
 class CalculateScores extends Component {
-  constructor (props) {
+  constructor(props) {
     super(props);
     this.state = {
       users: [],
-      suggestions: [],
-      text: '',
-      playerList: [],
+      players: [],
+      scorecard: [],
+      course: [],
       loading: true,
-    }
-    this.createNewScorecard = this.createNewScorecard.bind(this);
+    };
   }
 
+  /* Load user list, most recent scorecard, and course */
   componentDidMount() {
-    this.props.firebase.users().on('value', snapshot => {
-      const currentUsers = snapshot.val();
-      const userList = this.state.users;
-      for(let item in currentUsers) {
-        userList.push(currentUsers[item].username)
-      }
+    this.props.firebase.scorecards().on('value', snapshot => {
+      const scorecardObject = snapshot.val();
+      const scorecardList = Object.keys(scorecardObject).map(key => ({
+        ...scorecardObject[key],
+        uid: key,
+      }));
+      let lastScorecard = scorecardList[scorecardList.length-1];
       this.setState({
-        users: userList,
-        loading: false,
+        scorecard: lastScorecard,
+        players: lastScorecard.players,
+      });
+      if(lastScorecard.players && lastScorecard.players[0].uid && lastScorecard.players[0].holes) {
+        this.setState({loading: false});
+      }
+    });
+    this.props.firebase.courses().once('value', snapshot => {
+      const coursesObject = snapshot.val();
+      const coursesList = Object.keys(coursesObject).map(key => ({
+        ...coursesObject[key],
+        uid: key,
+      }));
+      let lastCourse = coursesList[coursesList.length-1];
+      this.setState({
+        course: lastCourse,
       });
     });
   }
 
   componentWillUnmount() {
-    this.props.firebase.users().off();
+    this.props.firebase.scorecards().off();
   }
 
-  onTextChanged = (event) => {
-    const value = event.target.value;
-    let suggestions = [];
-    if(value.length > 0) {
-      const regex = new RegExp(`^${value}`, 'i');
-      suggestions = this.state.users.sort().filter(item => regex.test(item));
-    }
-      this.setState(() =>  ({ suggestions, text: value }));     
-      
-  }
+  // onHandicapChange = event => {
+  //   const value = event.target.value;
+  //   if(value >= 0) {
+  //     const tempId = event.target.id;
+  //     let players = this.state.scorecard.players;
+  //     let playersIndex = '';
+  //     let player = players.find(function(item, index) {
+  //       playersIndex = index;
+  //       return tempId === item.uid
+  //     });
+  //     player.handicap = event.target.value;
+  //     players[playersIndex] = player;
+  //     this.setState({players: players});
+  //   };
+  // }
 
-  suggestionSelected (value) {
-    let tempList = this.state.playerList;
-    tempList.push(value);
-    this.setState(() => ({
-      playerList: tempList,
-      player: value,
-      text: '',
-      suggestions: [],
-    }))
-  }
+  // onScoreChange = event => {
+  //   const value = event.target.value;
+  //   let tempValues = event.target.id.split(' ');
+  //   const nameLength = tempValues.length - 1;
+  //   const holeName = tempValues[nameLength];
+  //   let playerName = '';
+  //   for(let i=0; i < nameLength; i++) {
+  //     playerName += tempValues[i];
+  //     if(i < (nameLength -1)) playerName += " ";
+  //   }
+  //   if(value >= 0) {
+  //     let players = this.state.scorecard.players;
+  //     let playersIndex = '';
+  //     let player = players.find(function(item, index) {
+  //       playersIndex = index;
+  //       return playerName === item.username
+  //     });
+  //     let holes = player.holes;
+  //     let holeIndex = '';
+  //     holes.find(function(item, index){
+  //       holeIndex = index;
+  //       return holeName === item.name
+  //     })
+  //     player.holes[holeIndex].score = value;
+  //     players[playersIndex] = player;
+  //     this.setState({players: players});
+  //   };
+  // }
 
-  renderSuggestions () {
-    const { suggestions } = this.state;
-    if (suggestions.length === 0) {
-      return null;
-    }
-    return (
-      <ul>
-        {suggestions.map((item) => <li key={item} onClick={() => this.suggestionSelected(item)}>{item}</li>)}
-      </ul>
-    )
-  }
-
-  renderPlayers () {
-    if (this.state.playerList.length === 0) {
-      return null;
-    }
-    return (
-      <ul>
-        {this.state.playerList.map((item) => <li key={item}>{item}</li>)}
-      </ul>
-    )
-  }
-
-  createNewScorecard (event) {
+  saveScorecard(event) {
     event.preventDefault();
-    let today = new Date();
-    today = today.toString();
-    let newRecord = this.props.firebase.db.ref('scorecards/').push();
-    let newItem = {
-      dateOfRound: today,
-      players: this.state.playerList,
-    };
-    this.setState({
-      scorecard: newRecord,
-    });
-    console.log('this.state', this.state);
-    newRecord.set(newItem);
-    this.props.history.push(ROUTES.SCORECARD);
+    const currentScorecardKey = this.state.scorecard.uid;
+    let newRecord = this.props.firebase.db.ref('scorecards/' + currentScorecardKey);
+    newRecord.set(this.state.scorecard.players);
+    this.props.history.push(ROUTES.HOME);
   }
 
-  createNewCourse (){
-    let newCourse = this.props.firebase.db.ref('courses/').push();
-    let newItem = {
-      name: 'Sunset',
-      holes: [
-        {name: 'Hole1', par: 4, handicap: 11},
-        {name: 'Hole2', par: 3, handicap: 13},
-        {name: 'Hole3', par: 4, handicap: 17},
-        {name: 'Hole4', par: 4, handicap: 3},
-        {name: 'Hole5', par: 5, handicap: 15},
-        {name: 'Hole6', par: 3, handicap: 9},
-        {name: 'Hole7', par: 4, handicap: 5},
-        {name: 'Hole8', par: 4, handicap: 1},
-        {name: 'Hole9', par: 5, handicap: 7},
-        {name: 'Hole10', par: 4, handicap: 16},
-        {name: 'Hole11', par: 3, handicap: 10},
-        {name: 'Hole12', par: 5, handicap: 6},
-        {name: 'Hole13', par: 4, handicap: 14},
-        {name: 'Hole14', par: 4, handicap: 4},
-        {name: 'Hole15', par: 4, handicap: 8},
-        {name: 'Hole16', par: 3, handicap: 18},
-        {name: 'Hole17', par: 5, handicap: 12},
-        {name: 'Hole18', par: 4, handicap: 2},
-      ],
-    };
-    newCourse.set(newItem);
-  }
-
-  render () {
-    const { text, loading } = this.state;
-    if(loading){
-      return <div>Loading Players</div>
-    };
-    return (
-      <div className='SelectPlayer'>
-        {this.renderPlayers()}
-        <h6>Press "Create Scorecard" when finished entering players.</h6>
-        <button className='CreateScorecard' onClick={this.createNewScorecard}>
-          Create Scorecard 
-        </button>
-        <br/> <br/>
-        <h4>Enter Player Names</h4>
-        
-        <div className='AutoCompleteText'>
-            <input value={text} onChange={this.onTextChanged} type='text' /> 
-            {this.renderSuggestions()}
+  render() {
+    if(this.state.loading){
+      if(this.state.scorecard.players && !this.state.scorecard.players[0].holes) {
+        return (
+          <div>
+            <button onClick={this.updatePlayerData}>Initialize Scorecard</button>
+          </div>
+        )
+      } else {
+        return (
+          <div>
+            <h2>Calculating scores</h2>
+          </div>
+        )
+      }
+    } else {
+      return (
+        <div className="results">
+          <h1>Results</h1>
         </div>
-        <br/>
-      </div>
-    )
+      );
+    }
   }
-} 
+}
 
-export default withRouter(withFirebase(CalculateScores));
+
+
+export default withFirebase(CalculateScores);
