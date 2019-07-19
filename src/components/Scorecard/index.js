@@ -89,7 +89,7 @@ class Scorecard extends Component {
   }
 
   componentWillUnmount() {
-    this.props.firebase.users().off();
+    this.props.firebase.off();
   }
 
   onHandicapChange = event => {
@@ -161,7 +161,6 @@ class Scorecard extends Component {
       if(this.state.scorecard.players && !this.state.scorecard.players[0].holes) {
         return (
           <div>
-            <h2>Loading...</h2>
             <button onClick={this.updatePlayerData}>Initialize Scorecard</button>
           </div>
         )
