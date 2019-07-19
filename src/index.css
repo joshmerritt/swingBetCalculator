@@ -108,7 +108,7 @@ form button {
 button {
   border-radius: 2px;
   min-width: 88px;
-  background-color: #FA6900;
+  background-color: rgba(20, 80, 50, 0.63);
   cursor: pointer;
   border: 0;
   min-width: 120px;
