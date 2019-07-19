@@ -31,9 +31,6 @@ const NavigationAuth = () => (
       <Link to={ROUTES.ADMIN}>Admin</Link>
     </li>
     <li>
-      <Link to={ROUTES.SCORECARD}>Scorecard</Link>
-    </li>
-    <li>
       <Link to={ROUTES.CREATE_SCORECARD}>New Scorecard</Link>
     </li>
     <li>

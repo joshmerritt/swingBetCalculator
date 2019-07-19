@@ -65,7 +65,8 @@ class Scorecard extends Component {
   }
 
   componentWillUnmount() {
-    this.props.firebase.off();
+    this.props.firebase.users().off();
+    this.props.firebase.scorecards().off();
   }
 
   /* Create Holes array to hold each players scores */
@@ -141,20 +142,9 @@ class Scorecard extends Component {
   saveScorecard(event) {
     event.preventDefault();
     const currentScorecardKey = this.state.scorecard.uid;
-    console.log('currentScorecardKey', currentScorecardKey);
     let newRecord = this.props.firebase.db.ref('scorecards/' + currentScorecardKey);
-    console.log('scorecard Record', newRecord);
-    // let newItem = {
-    //   dateOfRound: today,
-    //   players: this.state.playerList,
-    // };
-    // this.setState({
-    //   scorecard: newRecord,
-    // });
-    console.log('this.state', this.state);
     newRecord.set(this.state.scorecard.players);
     this.props.history.push(ROUTES.HOME);
-  
   }
 
   render() {

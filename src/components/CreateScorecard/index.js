@@ -92,7 +92,6 @@ class CreateScorecard extends Component {
     this.setState({
       scorecard: newRecord,
     });
-    console.log('this.state', this.state);
     newRecord.set(newItem);
     this.props.history.push(ROUTES.SCORECARD);
   }
