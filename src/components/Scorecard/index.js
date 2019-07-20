@@ -23,6 +23,7 @@ class Scorecard extends Component {
   this.onScoreChange = this.onScoreChange.bind(this);
   this.saveScorecard = this.saveScorecard.bind(this);
   this.updateSwingers = this.updateSwingers.bind(this);
+  this.renderResults = this.renderResults.bind(this);
   }
 
   /* Load user list, most recent scorecard, and course */
@@ -87,9 +88,12 @@ class Scorecard extends Component {
       tempUser.holes = holes;
       playersTemp.push(tempUser);
     };
+    let today = new Date();
+    today = today.toString();
     let scorecardTemp = this.props.firebase.scorecard(this.state.scorecard.uid);
     scorecardTemp.set({
       players: playersTemp,
+      dateOfRound: today,
     });
     this.setState({loading: false});
   }
@@ -167,28 +171,55 @@ class Scorecard extends Component {
     this.createMatchups();
     const theCourse = this.state.course;
     const theScorecard = this.state.scorecard;
-    console.log('theCourse', theCourse);
-    console.log('theScorecard', theScorecard);
     theScorecard.matchups.forEach(function(matchup) {
+      let tempMatchups = [];
       let ids = matchup.players;
+      let swingersRunningTotal = 0;
       theCourse.holes.forEach(function(hole, index){
         let par = hole.par;
+        let holeHandicap = hole.handicap;
         let players = ids.map(function(id){
           return theScorecard.players.find(function(player){
             return player.uid === id
           });
         });
+        let handicapScores = [];
         let handicapWinner;
+        players.forEach(function(player){
+          let playerHandicap = Number(player.handicap);
+          let numHandicapStrokes = 0;
+          while(playerHandicap >= holeHandicap) {
+            numHandicapStrokes -= 1;
+            playerHandicap -= 18;
+          }
+          handicapScores.push(Number(player.holes[index].score) + numHandicapStrokes);
+        });
+        let swingerLowHandicapScore = Math.min(handicapScores[0], handicapScores[1]);
+        let oppLowHandicapScore = Math.min(handicapScores[2], handicapScores[3]);
+        if(swingerLowHandicapScore < oppLowHandicapScore) {
+          if(swingerLowHandicapScore === oppLowHandicapScore){
+            handicapWinner = 'Tied ' + hole.name;
+          } else {
+            handicapWinner = 'Swingers won ' + hole.name;
+            swingersRunningTotal += 1;
+          }
+        } else {
+          handicapWinner = 'Opponents won ' + hole.name;
+          swingersRunningTotal -= 1;
+        }
         let swingersUnderPar = Math.max(0, par - players[0].holes[index].score) + Math.max(0, par - players[1].holes[index].score);
         let oppsUnderPar = Math.max(0, par - players[2].holes[index].score) + Math.max(0, par - players[3].holes[index].score);
         let strokesUnderParDifference = swingersUnderPar - oppsUnderPar;
-        let strokeResult = ( strokesUnderParDifference ? 'Swingers gained ' + strokesUnderParDifference + ' for being under par' : 'Opponents gained ' + strokesUnderParDifference + ' for being under par');
-        console.log('strokeResult', strokeResult);
-        console.log('swingers :: opps', swingersUnderPar, " :: ", oppsUnderPar);
-        console.log('hole :: players', hole, " :: ", players);
+        swingersRunningTotal += strokesUnderParDifference;
+        let strokeResult = ( strokesUnderParDifference ? handicapWinner + ' and Swingers gained ' + strokesUnderParDifference + ' for being under par. Swingers total: ' + swingersRunningTotal + '. ':  handicapWinner + ' and Opponents gained ' + strokesUnderParDifference + ' for being under par. Swingers total: ' + swingersRunningTotal + '. ');
+        tempMatchups.push(strokeResult);
       });
-      console.log('matchup', matchup);
+      matchup.result = tempMatchups;
+      matchup.totalResult = swingersRunningTotal;
     });
+    let newRecord = this.props.firebase.db.ref('scorecards/' + this.state.scorecard.uid);
+    newRecord.set(this.state.scorecard);
+    this.renderResults();
   }
 
   createMatchups() {
@@ -208,6 +239,13 @@ class Scorecard extends Component {
     }
     thisScorecard.matchups = matchups;
     this.setState({scorecard: thisScorecard});
+  }
+
+  renderResults() {
+    console.log('renderResults matchups', this.state.scorecard.matchups);
+    if(this.state.scorecard.matchups){
+      
+    }
   }
 
   render() {
@@ -282,7 +320,7 @@ class Scorecard extends Component {
           <div>
             <br/> <br/>
             <button className="saveButton" onClick={this.saveScorecard}>Save Scorecard</button>
-          </div>    
+          </div>
         </div>
       );
     }
