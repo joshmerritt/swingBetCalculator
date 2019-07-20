@@ -148,7 +148,6 @@ class Scorecard extends Component {
     let players = this.state.scorecard.players;
     let playersIndex = '';
     let player = players.find(function(item, index) {
-      //console.log('playerName : username : index', playerName, " : ", item.username, " : ", index);
       playersIndex = index;
       return playerName === item.username
     });
@@ -164,7 +163,7 @@ class Scorecard extends Component {
     newRecord.set(this.state.scorecard);
     event.preventDefault();
     this.calculateScores();
-//    this.props.history.push(ROUTES.HOME);
+    this.props.history.push(ROUTES.SCORECARD_HISTORY);
   }
 
   calculateScores() {
@@ -180,7 +179,7 @@ class Scorecard extends Component {
         let holeHandicap = hole.handicap;
         let players = ids.map(function(id){
           return theScorecard.players.find(function(player){
-            return player.uid === id
+            return player.uid === id.uid
           });
         });
         let handicapScores = [];
@@ -196,7 +195,7 @@ class Scorecard extends Component {
         });
         let swingerLowHandicapScore = Math.min(handicapScores[0], handicapScores[1]);
         let oppLowHandicapScore = Math.min(handicapScores[2], handicapScores[3]);
-        if(swingerLowHandicapScore < oppLowHandicapScore) {
+        if(swingerLowHandicapScore <= oppLowHandicapScore) {
           if(swingerLowHandicapScore === oppLowHandicapScore){
             handicapWinner = 'Tied ' + hole.name;
           } else {
@@ -231,9 +230,9 @@ class Scorecard extends Component {
     const numOpps = opponents.length;
     for(let i = 0; i < numOpps; i++) {
       for(let j = i+1; j<numOpps; j++) {
-        let thisMatchup = {players: [swingers[0].uid, swingers[1].uid], result:''};
-        thisMatchup.players.push(opponents[i].uid);
-        thisMatchup.players.push(opponents[j].uid);
+        let thisMatchup = {players: [swingers[0], swingers[1]], result:''};
+        thisMatchup.players.push(opponents[i]);
+        thisMatchup.players.push(opponents[j]);
         matchups.push(thisMatchup);
       }
     }
