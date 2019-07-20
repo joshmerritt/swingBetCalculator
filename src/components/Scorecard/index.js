@@ -169,6 +169,26 @@ class Scorecard extends Component {
     const theScorecard = this.state.scorecard;
     console.log('theCourse', theCourse);
     console.log('theScorecard', theScorecard);
+    theScorecard.matchups.forEach(function(matchup) {
+      let ids = matchup.players;
+      theCourse.holes.forEach(function(hole, index){
+        let par = hole.par;
+        let players = ids.map(function(id){
+          return theScorecard.players.find(function(player){
+            return player.uid === id
+          });
+        });
+        let handicapWinner;
+        let swingersUnderPar = Math.max(0, par - players[0].holes[index].score) + Math.max(0, par - players[1].holes[index].score);
+        let oppsUnderPar = Math.max(0, par - players[2].holes[index].score) + Math.max(0, par - players[3].holes[index].score);
+        let strokesUnderParDifference = swingersUnderPar - oppsUnderPar;
+        let strokeResult = ( strokesUnderParDifference ? 'Swingers gained ' + strokesUnderParDifference + ' for being under par' : 'Opponents gained ' + strokesUnderParDifference + ' for being under par');
+        console.log('strokeResult', strokeResult);
+        console.log('swingers :: opps', swingersUnderPar, " :: ", oppsUnderPar);
+        console.log('hole :: players', hole, " :: ", players);
+      });
+      console.log('matchup', matchup);
+    });
   }
 
   createMatchups() {
