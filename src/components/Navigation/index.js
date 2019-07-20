@@ -34,6 +34,9 @@ const NavigationAuth = () => (
       <Link to={ROUTES.CREATE_SCORECARD}>New Round</Link>
     </li>
     <li>
+      <Link to={ROUTES.SCORECARD}>Latest Round</Link>
+    </li>
+    <li>
       <Link to={ROUTES.SCORECARD_HISTORY}>Last Round Results</Link>
     </li>
     <li>
