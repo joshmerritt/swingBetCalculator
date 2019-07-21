@@ -70,10 +70,10 @@ const ResultsList = ({ scorecard }) => (
  <div>
  <h3>{scorecard.dateOfRound}</h3>
  <ul>
-   <strong>Individual Results</strong>
+   <strong>Individual Results</strong> (bet = ${scorecard.betAmount})
    {scorecard.players.map(player => (
      <li key={player.uid}>
-       {player.username}: <strong>{player.totalResult}</strong>
+       {player.username}: <strong>{player.totalResult * scorecard.betAmount}</strong>
      </li>
    ))}
   <ul><br/>
