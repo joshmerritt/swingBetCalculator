@@ -23,7 +23,7 @@ class Scorecard extends Component {
   this.onScoreChange = this.onScoreChange.bind(this);
   this.saveScorecard = this.saveScorecard.bind(this);
   this.updateSwingers = this.updateSwingers.bind(this);
-  this.renderResults = this.renderResults.bind(this);
+  this.onBetChanged = this.onBetChanged.bind(this);
   }
 
   /* Load user list, most recent scorecard, and course */
@@ -94,6 +94,7 @@ class Scorecard extends Component {
     scorecardTemp.set({
       players: playersTemp,
       dateOfRound: today,
+      betAmount: 1,
     });
     this.setState({loading: false});
   }
@@ -154,7 +155,7 @@ class Scorecard extends Component {
     player.swinger = !player.swinger;
     players[playersIndex] = player;
     this.setState({players: players});
-  };
+  }
 
 
   saveScorecard = event => {
@@ -210,21 +211,30 @@ class Scorecard extends Component {
         let oppsUnderPar = Math.max(0, par - players[2].holes[index].score) + Math.max(0, par - players[3].holes[index].score);
         let strokesUnderParDifference = swingersUnderPar - oppsUnderPar;
         swingersRunningTotal += strokesUnderParDifference;
-        let strokeResult = ( strokesUnderParDifference ? handicapWinner + ' and Swingers gained ' + strokesUnderParDifference + ' for being under par. Swingers total: ' + swingersRunningTotal + '. ':  handicapWinner + ' and Opponents gained ' + strokesUnderParDifference + ' for being under par. Swingers total: ' + swingersRunningTotal + '. ');
+        let strokeResult = ( strokesUnderParDifference > 0 ? (handicapWinner + ' and Swingers gained ' + strokesUnderParDifference + ' for being under par. Swingers total: ' + swingersRunningTotal + '. '):  (handicapWinner + ' and Opponents gained ' + -strokesUnderParDifference + ' for being under par. Swingers total: ' + swingersRunningTotal + '. '));
         tempMatchups.push(strokeResult);
       });
       matchup.result = tempMatchups;
       matchup.totalResult = swingersRunningTotal;
+      theScorecard.players.forEach(function(player) {
+        if(player.uid === matchup.players[0].uid || player.uid === matchup.players[1].uid) {
+          player.totalResult += (swingersRunningTotal/2);
+        } else if(player.uid === matchup.players[2].uid || player.uid === matchup.players[3].uid) {
+          player.totalResult -= (swingersRunningTotal/2);
+        }
+      });
     });
     let newRecord = this.props.firebase.db.ref('scorecards/' + this.state.scorecard.uid);
     newRecord.set(this.state.scorecard);
-    this.renderResults();
   }
 
   createMatchups() {
     let thisScorecard = this.state.scorecard;
     let matchups = [];
     const playersTemp = this.state.scorecard.players;
+    playersTemp.forEach(function(player){
+      player.totalResult = 0;
+    });
     let swingers = playersTemp.filter(player => player.swinger);
     let opponents = playersTemp.filter(player => !player.swinger);
     const numOpps = opponents.length;
@@ -240,13 +250,13 @@ class Scorecard extends Component {
     this.setState({scorecard: thisScorecard});
   }
 
-  renderResults() {
-    console.log('renderResults matchups', this.state.scorecard.matchups);
-    if(this.state.scorecard.matchups){
-      
-    }
+  onBetChanged(event) {
+    const newBetAmount = event.target.value;
+    let scorecard = this.state.scorecard;
+    scorecard.betAmount = newBetAmount;
+    this.setState({scorecard: scorecard});
   }
-
+  
   render() {
     if(this.state.loading){
       if(this.state.scorecard.players && !this.state.scorecard.players[0].holes) {
@@ -317,8 +327,12 @@ class Scorecard extends Component {
             </tbody>
           </table>
           <div>
-            <br/> <br/>
-            <button className="saveButton" onClick={this.saveScorecard}>Save Scorecard</button>
+             <span>
+              <p>Bet Amount</p>
+              <input className="betAmount" value={this.state.scorecard.betAmount} onChange={this.onBetChanged} type="number"/>
+              <br/>
+              <button className="saveButton" onClick={this.saveScorecard}>Save Scorecard</button>
+            </span>
           </div>
         </div>
       );

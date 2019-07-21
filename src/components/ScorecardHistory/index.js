@@ -10,7 +10,6 @@ class ScorecardHistory extends Component {
       loading: true,
       users: [],
     };
-    this.updatePlayers = this.updatePlayers.bind(this);
   }
 
   componentDidMount() {
@@ -47,22 +46,9 @@ class ScorecardHistory extends Component {
     this.props.firebase.scorecards().off();
   }
 
-  updatePlayers() {
-    console.log('this', this);
-    if(this.state.scorecard){
-      let player = this.state.users.find(function(value){
-      
-        return value.uid = this.state.scorecard.matchup[0].players[0];
-      });
-      console.log('player', player);
-    }
-
-  }
-
   render() {
     const { scorecard, loading } = this.state;
     if(scorecard && !loading){
-      //this.updatePlayers();
       return (
         <div>
         <h2>Results for round on</h2>
@@ -80,12 +66,17 @@ class ScorecardHistory extends Component {
   }
 }
 
-
-
 const ResultsList = ({ scorecard }) => (
  <div>
  <h3>{scorecard.dateOfRound}</h3>
-  <ul>
+ <ul>
+   <strong>Individual Results</strong>
+   {scorecard.players.map(player => (
+     <li key={player.uid}>
+       {player.username}: <strong>{player.totalResult}</strong>
+     </li>
+   ))}
+  <ul><br/>
     {scorecard.matchups.map(matchup => (
       <ul>
         <li key={matchup.players[2].uid + matchup.players[3].uid}>
@@ -107,6 +98,7 @@ const ResultsList = ({ scorecard }) => (
         <br/>
       </ul>
     ))}
+  </ul>
   </ul>
 </div>
 );

@@ -82,7 +82,7 @@ class CreateScorecard extends Component {
 
   createNewScorecard (event) {
     event.preventDefault();
-        let newRecord = this.props.firebase.db.ref('scorecards/').push();
+    let newRecord = this.props.firebase.db.ref('scorecards/').push();
     let newItem = {
       players: this.state.playerList,
     };
