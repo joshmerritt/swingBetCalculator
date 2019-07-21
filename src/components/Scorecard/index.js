@@ -218,9 +218,9 @@ class Scorecard extends Component {
       matchup.totalResult = swingersRunningTotal;
       theScorecard.players.forEach(function(player) {
         if(player.uid === matchup.players[0].uid || player.uid === matchup.players[1].uid) {
-          player.totalResult += (swingersRunningTotal/2);
+          player.totalResult += (swingersRunningTotal);
         } else if(player.uid === matchup.players[2].uid || player.uid === matchup.players[3].uid) {
-          player.totalResult -= (swingersRunningTotal/2);
+          player.totalResult -= (swingersRunningTotal);
         }
       });
     });
