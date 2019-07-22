@@ -1,5 +1,7 @@
 import React, { Component } from 'react';
 
+
+
 import { withFirebase } from '../Firebase';
 
 class ScorecardHistory extends Component {
@@ -10,6 +12,7 @@ class ScorecardHistory extends Component {
       loading: true,
       users: [],
     };
+    this.updateSelectedScorecard = this.updateSelectedScorecard.bind(this);
   }
 
   componentDidMount() {
@@ -44,13 +47,26 @@ class ScorecardHistory extends Component {
 
   componentWillUnmount() {
     this.props.firebase.scorecards().off();
+    this.props.firebase.users().off();
+  }
+
+  updateSelectedScorecard(event) {
+    this.setState({scorecard: this.state.scorecardList[event.target.value]})
   }
 
   render() {
-    const { scorecard, loading } = this.state;
-    if(scorecard && !loading){
+    const { scorecard, loading, scorecardList } = this.state;
+    if(scorecard && scorecard.matchups && !loading){
       return (
         <div>
+        <h3>Select Round:</h3>
+        <select className="scorecardSelect" onChange={this.updateSelectedScorecard}>
+          {scorecardList.map((option, index) =>
+            <option key={option.dateOfRound} value={index}>
+              {option.dateOfRound}
+            </option>
+            )}
+        </select>
         <h2>Results for round on</h2>
         <ResultsList scorecard={scorecard} />
         </div>
@@ -78,7 +94,7 @@ const ResultsList = ({ scorecard }) => (
    ))}
   <ul><br/>
     {scorecard.matchups.map(matchup => (
-      <ul>
+      <ul key={matchup.players[2].uid + matchup.players[3].uid + "List"}>
         <li key={matchup.players[2].uid + matchup.players[3].uid}>
           <strong>Total Result:</strong> {matchup.totalResult}
         </li>
@@ -90,7 +106,7 @@ const ResultsList = ({ scorecard }) => (
         </li>
         <ul>
           {matchup.result.map(hole => (
-            <li>
+            <li key={hole + matchup.players[2].uid + matchup.players[3].uid}>
               {hole}
             </li>
           ))}
