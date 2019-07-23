@@ -56,17 +56,17 @@ class ScorecardHistory extends Component {
 
   render() {
     const { scorecard, loading, scorecardList } = this.state;
-    if(scorecard && scorecard.matchups && !loading){
+    if(scorecard && scorecardList && !loading){
       return (
         <div>
         <h3>Select Round:</h3>
-        <select className="scorecardSelect" onChange={this.updateSelectedScorecard}>
-          {scorecardList.map((option, index) =>
-            <option key={option.dateOfRound} value={index}>
-              {option.dateOfRound}
-            </option>
-            )}
-        </select>
+          <select className="scorecardSelect" onChange={this.updateSelectedScorecard}>
+            {scorecardList.map((option, index) =>
+              <option key={option.dateOfRound} value={index}>
+                {option.dateOfRound}
+              </option>
+              )}
+          </select>
         <h2>Results for round on</h2>
         <ResultsList scorecard={scorecard} />
         </div>
@@ -82,6 +82,7 @@ class ScorecardHistory extends Component {
   }
 }
 
+
 const ResultsList = ({ scorecard }) => (
  <div>
  <h3>{scorecard.dateOfRound}</h3>
@@ -93,7 +94,7 @@ const ResultsList = ({ scorecard }) => (
      </li>
    ))}
   <ul><br/>
-    {scorecard.matchups.map(matchup => (
+    {scorecard.matchups ? scorecard.matchups.map(matchup => (
       <ul key={matchup.players[2].uid + matchup.players[3].uid + "List"}>
         <li key={matchup.players[2].uid + matchup.players[3].uid}>
           <strong>Total Result:</strong> {matchup.totalResult}
@@ -113,7 +114,7 @@ const ResultsList = ({ scorecard }) => (
         </ul>
         <br/>
       </ul>
-    ))}
+    )): <h3>No Scores Entered</h3> }
   </ul>
   </ul>
 </div>
