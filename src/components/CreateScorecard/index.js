@@ -12,9 +12,11 @@ class CreateScorecard extends Component {
       suggestions: [],
       text: '',
       playerList: [],
+      numberOfMatchups: 0,
       loading: true,
     }
     this.createNewScorecard = this.createNewScorecard.bind(this);
+    this.factorialize = this.factorialize.bind(this);
   }
 
   componentDidMount() {
@@ -55,6 +57,22 @@ class CreateScorecard extends Component {
       text: '',
       suggestions: [],
     }))
+    this.updateNumberOfMatchups();
+  }
+
+  factorialize(num) {
+      if (num === 0)
+        { return 1; }
+      else
+        { return num * this.factorialize( num - 1 ); }
+  }
+
+  updateNumberOfMatchups () {
+    let numPlayers = this.state.playerList.length;
+    if(numPlayers >= 4) {
+      let numMatchups = this.factorialize(numPlayers-2)/(this.factorialize(2)*this.factorialize(numPlayers-4));
+      this.setState(() => ({numberOfMatchups: numMatchups}));
+    };
   }
 
   renderSuggestions () {
@@ -129,7 +147,8 @@ class CreateScorecard extends Component {
     return (
       <div className='SelectPlayer'>
         {this.renderPlayers()}
-        <h6>Press "Create Scorecard" when finished entering players.</h6>
+        <h5>With {this.state.playerList.length} {(this.state.playerList.length===1)? "player": "players"}, there will be {this.state.numberOfMatchups} {(this.state.numberOfMatchups===1)? "bet": "bets"} per hole.</h5>
+        <h4>Press "Create Scorecard" when finished entering players.</h4>
         <button className='CreateScorecard' onClick={this.createNewScorecard}>
           Create Scorecard 
         </button>

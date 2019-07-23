@@ -16,6 +16,7 @@ class Scorecard extends Component {
     players: [],
     scorecard: [],
     course: [],
+    scoresEntered: false,
     loading: true,
   };
   this.updatePlayerData = this.updatePlayerData.bind(this);
@@ -141,7 +142,17 @@ class Scorecard extends Component {
       player.holes[holeIndex].score = value;
       players[playersIndex] = player;
       this.setState({players: players});
+      let someScoresEntered = false;
+      players.forEach(function(player) {
+        if(player.holes[0] !== '') {
+          someScoresEntered = true;
+        } else {
+          someScoresEntered = false;
+        }
+      });
+      this.setState({scoresEntered: someScoresEntered});
     };
+
   }
 
   updateSwingers = event => {
@@ -331,7 +342,7 @@ class Scorecard extends Component {
               <p>Bet Amount</p>
               <input className="betAmount" value={this.state.scorecard.betAmount} onChange={this.onBetChanged} type="number"/>
               <br/>
-              <button className="saveButton" onClick={this.saveScorecard}>Save Scorecard</button>
+              <button className="saveButton" onClick={this.saveScorecard} disabled={!this.state.scoresEntered}>Save Scorecard</button>
             </span>
           </div>
         </div>
