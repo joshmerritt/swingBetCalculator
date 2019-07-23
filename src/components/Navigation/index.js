@@ -19,25 +19,19 @@ const Navigation = () => (
 const NavigationAuth = () => (
   <ul>
     <li>
-      <Link to={ROUTES.LANDING}>Landing</Link>
-    </li>
-    <li>
-      <Link to={ROUTES.HOME}>Home</Link>
-    </li>
-    <li>
-      <Link to={ROUTES.ACCOUNT}>Account</Link>
-    </li>
-    <li>
-      <Link to={ROUTES.ADMIN}>Admin</Link>
-    </li>
-    <li>
       <Link to={ROUTES.CREATE_SCORECARD}>New Round</Link>
     </li>
     <li>
-      <Link to={ROUTES.SCORECARD}>Latest Round</Link>
+      <Link to={ROUTES.SCORECARD}>Score Round</Link>
     </li>
     <li>
-      <Link to={ROUTES.SCORECARD_HISTORY}>Last Round Results</Link>
+      <Link to={ROUTES.SCORECARD_HISTORY}>Round Results</Link>
+    </li>
+    <li>
+      <Link to={ROUTES.ACCOUNT}>Update Account</Link>
+    </li>
+    <li>
+      <Link to={ROUTES.ADMIN}>Users</Link>
     </li>
     <li>
       <SignOutButton />

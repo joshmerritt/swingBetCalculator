@@ -3,9 +3,11 @@ import * as ROUTES from '../../constants/routes';
 import { withFirebase } from '../Firebase';
 
 /* 
-  Creates a scorecard table for the most recent created scorecard.
-  
-
+    - Creates a scorecard table for the most recent created scorecard
+    - Allows user to select swingers, adjust handicap, and enter hole scores
+    - Creates matchups for every combination of non-swinger players
+    - Upon save, calculates the outcome for every hole for every matchup  
+    - Redirects to view results upon save
 */
 
 class Scorecard extends Component {
@@ -16,7 +18,6 @@ class Scorecard extends Component {
     players: [],
     scorecard: [],
     course: [],
-    scoresEntered: false,
     loading: true,
   };
   this.updatePlayerData = this.updatePlayerData.bind(this);
@@ -27,7 +28,10 @@ class Scorecard extends Component {
   this.onBetChanged = this.onBetChanged.bind(this);
   }
 
-  /* Load user list, most recent scorecard, and course */
+/*
+    - Load user list, most recent scorecard, and course     
+*/
+
   componentDidMount() {
       this.props.firebase.users().on('value', snapshot => {
         const usersObject = snapshot.val();
@@ -67,12 +71,23 @@ class Scorecard extends Component {
       });
   }
 
+/*
+    - Remove query to fetch scorecard and user data when updated  
+*/
+
   componentWillUnmount() {
     this.props.firebase.users().off();
     this.props.firebase.scorecards().off();
   }
 
-  /* Create Holes array to hold each players scores */
+  /* 
+    - Called by user when it's the first load of this scorecard
+    - Create Holes array to hold each players scores
+    - Set the date of the round to today
+    - Mark the first two names as swingers 
+    - Set default bet to 1  
+  */
+
   updatePlayerData() {
     let playersTemp = [];
     let holes = [
@@ -87,6 +102,7 @@ class Scorecard extends Component {
       let tempPlayer = this.state.scorecard.players[i];
       let tempUser = this.state.users.find(player => player.username === tempPlayer);
       tempUser.holes = holes;
+      if(i<2) tempUser.swinger = true;
       playersTemp.push(tempUser);
     };
     let today = new Date();
@@ -99,6 +115,10 @@ class Scorecard extends Component {
     });
     this.setState({loading: false});
   }
+
+/*
+    - Update a players handicap for this scorecard
+*/
 
   onHandicapChange = event => {
     const value = event.target.value;
@@ -115,6 +135,11 @@ class Scorecard extends Component {
       this.setState({players: players});
     };
   }
+
+/*
+    - Upsert new value entered as a score
+    - Save to state
+*/
 
   onScoreChange = event => {
     const value = event.target.value;
@@ -142,19 +167,15 @@ class Scorecard extends Component {
       player.holes[holeIndex].score = value;
       players[playersIndex] = player;
       this.setState({players: players});
-      let someScoresEntered = false;
-      players.forEach(function(player) {
-        if(player.holes[0] !== '') {
-          someScoresEntered = true;
-        } else {
-          someScoresEntered = false;
-        }
-      });
-      this.setState({scoresEntered: someScoresEntered});
     };
 
   }
 
+/*
+    - Update which players are indicated as swingers
+    - Save to state
+*/
+  
   updateSwingers = event => {
     const playerName = event.target.name;
     let players = this.state.scorecard.players;
@@ -168,6 +189,9 @@ class Scorecard extends Component {
     this.setState({players: players});
   }
 
+/*
+    - Save the scorecard to the database and call calculateScores
+*/ 
 
   saveScorecard = event => {
     const currentScorecardKey = this.state.scorecard.uid;
@@ -177,6 +201,18 @@ class Scorecard extends Component {
     this.calculateScores();
     this.props.history.push(ROUTES.SCORECARD_HISTORY);
   }
+
+/*
+    - Calls createMatchups
+    - Iterates through each matchup
+    - For every hole calculate each players natural and handicap score
+    - Compare the team's lowest handicap adjusted score to determine winner
+    - Compare each team's natural strokes under par total
+    - Determine result and store to results object
+    - Keep track of runnning total
+    - Add total result of matchup to each player's individual result
+    - Save to database
+*/
 
   calculateScores() {
     this.createMatchups();
@@ -190,7 +226,10 @@ class Scorecard extends Component {
         let par = hole.par;
         let holeHandicap = hole.handicap;
         let players = ids.map(function(id){
+          console.log('id', id);
           return theScorecard.players.find(function(player){
+            console.log('player', player);
+            console.log('players', players);
             return player.uid === id.uid
           });
         });
@@ -239,6 +278,13 @@ class Scorecard extends Component {
     newRecord.set(this.state.scorecard);
   }
 
+  /*
+      - Initialize player's total result to 0
+      - Create array of swingers and opponents
+      - Loop through to create every combination of opponents
+      - Store all matchups on the local scorecard
+  */
+
   createMatchups() {
     let thisScorecard = this.state.scorecard;
     let matchups = [];
@@ -261,6 +307,10 @@ class Scorecard extends Component {
     this.setState({scorecard: thisScorecard});
   }
 
+  /*
+      Update the bet amount when it is changed
+  */
+
   onBetChanged(event) {
     const newBetAmount = event.target.value;
     let scorecard = this.state.scorecard;
@@ -268,6 +318,14 @@ class Scorecard extends Component {
     this.setState({scorecard: scorecard});
   }
   
+  /*
+      - Display loading if data not loaded yet
+      - Display initialize button if first load of this scorecard
+      - Display Scorecard
+      - Display bet amount input
+      - Display Save Scorecard button
+  */
+
   render() {
     if(this.state.loading){
       if(this.state.scorecard.players && !this.state.scorecard.players[0].holes) {
@@ -342,7 +400,7 @@ class Scorecard extends Component {
               <p>Bet Amount</p>
               <input className="betAmount" value={this.state.scorecard.betAmount} onChange={this.onBetChanged} type="number"/>
               <br/>
-              <button className="saveButton" onClick={this.saveScorecard} disabled={!this.state.scoresEntered}>Save Scorecard</button>
+              <button className="saveButton" onClick={this.saveScorecard}>Save Scorecard</button>
             </span>
           </div>
         </div>

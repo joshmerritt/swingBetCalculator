@@ -14,6 +14,7 @@ class CreateScorecard extends Component {
       playerList: [],
       numberOfMatchups: 0,
       loading: true,
+      createEnabled: false,
     }
     this.createNewScorecard = this.createNewScorecard.bind(this);
     this.factorialize = this.factorialize.bind(this);
@@ -71,7 +72,7 @@ class CreateScorecard extends Component {
     let numPlayers = this.state.playerList.length;
     if(numPlayers >= 4) {
       let numMatchups = this.factorialize(numPlayers-2)/(this.factorialize(2)*this.factorialize(numPlayers-4));
-      this.setState(() => ({numberOfMatchups: numMatchups}));
+      this.setState(() => ({numberOfMatchups: numMatchups, createEnabled: true}));
     };
   }
 
@@ -140,7 +141,7 @@ class CreateScorecard extends Component {
   }
 
   render () {
-    const { text, loading } = this.state;
+    const { text, loading, createEnabled } = this.state;
     if(loading){
       return <div>Loading Players</div>
     };
@@ -149,7 +150,7 @@ class CreateScorecard extends Component {
         {this.renderPlayers()}
         <h5>With {this.state.playerList.length} {(this.state.playerList.length===1)? "player": "players"}, there will be {this.state.numberOfMatchups} {(this.state.numberOfMatchups===1)? "bet": "bets"} per hole.</h5>
         <h4>Press "Create Scorecard" when finished entering players.</h4>
-        <button className='CreateScorecard' onClick={this.createNewScorecard}>
+        <button className='CreateScorecard' onClick={this.createNewScorecard} disabled={!createEnabled}>
           Create Scorecard 
         </button>
         <br/> <br/>
