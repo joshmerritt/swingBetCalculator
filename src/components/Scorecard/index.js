@@ -241,7 +241,8 @@ calculateScores() {
           }
           console.log('numHandicapStrokes', numHandicapStrokes);
           handicapScore += numHandicapStrokes;
-          player.handicapScores.push(Number(handicapScore));
+          let textHandicapScore = (numHandicapStrokes < 0 ? handicapScore + "/" + (handicapScore + numHandicapStrokes) : handicapScore);
+          player.handicapScores.push(textHandicapScore);
           handicapScores.push(Number(handicapScore));
         });
         let swingerLowHandicapScore = Math.min(handicapScores[0], handicapScores[1]);

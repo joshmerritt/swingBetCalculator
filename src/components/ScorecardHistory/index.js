@@ -82,10 +82,67 @@ class ScorecardHistory extends Component {
   }
 }
 
+const DisplayScorecard = ({ scorecard }) => (
+  <div className="scorecard">
+         <h1>Scorecard</h1>
+          <table className="holes">
+            <thead>
+              <tr>
+                <th>Player</th>
+                <th>Handicap</th>
+                <th>Swinger?</th>
+                <th>1</th>
+                <th>2</th>
+                <th>3</th>
+                <th>4</th>
+                <th>5</th>
+                <th>6</th>
+                <th>7</th>
+                <th>8</th>
+                <th>9</th>
+                <th>10</th>
+                <th>11</th>
+                <th>12</th>
+                <th>13</th>
+                <th>14</th>
+                <th>15</th>
+                <th>16</th>
+                <th>17</th>
+                <th>18</th>
+              </tr>
+            </thead>
+            <tbody>
+              {scorecard.players.map((player) => {
+                return (
+                  <tr key={player.uid}>
+                    <td>{player.username}</td>
+                    <td>
+                      {player.handicap}
+                    </td>
+                    <td>
+                      <input type="checkbox" name={player.username} checked={!!player.swinger}/>
+                    </td>
+                    {player.handicapScores.map((item, index) => {
+                      let playerHole = player.username + index + " Score" + item.name;
+                      return (
+                        <td key={playerHole}>
+                           {item} 
+                        </td>
+                      )
+                    })}
+                  </tr>
+                )
+              })}
+            </tbody>
+          </table>
+        </div>
+)
+
 
 const ResultsList = ({ scorecard }) => (
  <div>
  <h3>{scorecard.dateOfRound}</h3>
+ <DisplayScorecard scorecard={scorecard} />
  <ul>
    <strong>Individual Results</strong> (bet = ${scorecard.betAmount})
    {scorecard.players.map(player => (
