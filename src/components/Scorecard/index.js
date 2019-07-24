@@ -210,7 +210,7 @@ class Scorecard extends Component {
 
 calculateScores() {
     this.createMatchups();
-    const theCourse = {...this.state.course};
+    // const theCourse = {...this.state.course};
     const theScorecard = {...this.state.scorecard};
     theScorecard.players.forEach(function(player){
       player.handicapScores = [];
@@ -220,7 +220,7 @@ calculateScores() {
       let ids = matchup.players;
       let swingersRunningTotal = 0;
       let handicapScores = [];
-      theCourse.holes.forEach(function(hole, index){
+      theScorecard.course.holes.forEach(function(hole, index){
         let par = hole.par;
         let holeHandicap = hole.handicap;
         let players = ids.map(function(id){
@@ -232,13 +232,14 @@ calculateScores() {
         players.forEach(function(player){
           let playerHandicap = Number(player.handicap);
           let numHandicapStrokes = 0;
-          let handicapScore = Number(player.holes[index].score);
+          let naturalScore = Number(player.holes[index].score)
+          let handicapScore = naturalScore;
           while(playerHandicap >= holeHandicap) {
             numHandicapStrokes -= 1;
             playerHandicap -= 18;
           }
           handicapScore += numHandicapStrokes;
-          let textHandicapScore = (numHandicapStrokes < 0 ? handicapScore + "/" + (handicapScore + numHandicapStrokes) : handicapScore);
+          let textHandicapScore = (numHandicapStrokes < 0 ? naturalScore + "/" + handicapScore : naturalScore);
           player.handicapScores[index] = textHandicapScore;
           handicapScores.push(Number(handicapScore));
         });
