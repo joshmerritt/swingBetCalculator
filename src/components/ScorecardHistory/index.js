@@ -120,7 +120,7 @@ const DisplayScorecard = ({ scorecard }) => (
                       {player.handicap}
                     </td>
                     <td>
-                      <input type="checkbox" name={player.username} checked={!!player.swinger}/>
+                      <input type="checkbox" name={player.username} checked={!!player.swinger} readOnly/>
                     </td>
                     {player.handicapScores.map((item, index) => {
                       let playerHole = player.username + index + " Score" + item.name;

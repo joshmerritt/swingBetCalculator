@@ -237,7 +237,7 @@ calculateScores() {
           }
           handicapScore += numHandicapStrokes;
           let textHandicapScore = (numHandicapStrokes < 0 ? handicapScore + "/" + (handicapScore + numHandicapStrokes) : handicapScore);
-          player.handicapScores.push(textHandicapScore);
+          player.handicapScores[index] = textHandicapScore;
           handicapScores.push(Number(handicapScore));
         });
         let swingerLowHandicapScore = Math.min(handicapScores[0], handicapScores[1]);
@@ -323,8 +323,9 @@ calculateScores() {
   */
 
   render() {
+    const { scorecard, course } = this.state;
     if(this.state.loading){
-      if(this.state.scorecard.players && !this.state.scorecard.players[0].holes) {
+      if(scorecard.players && !scorecard.players[0].holes) {
         return (
           <div>
             <button onClick={this.updatePlayerData}>Initialize Scorecard</button>
@@ -368,7 +369,7 @@ calculateScores() {
               </tr>
             </thead>
             <tbody>
-              {this.state.scorecard.players.map((player) => {
+              {scorecard.players.map((player) => {
                 return (
                   <tr key={player.uid}>
                     <td>{player.username}</td>
@@ -394,7 +395,7 @@ calculateScores() {
           <div>
              <span>
               <p>Bet Amount</p>
-              <input className="betAmount" value={this.state.scorecard.betAmount} onChange={this.onBetChanged} type="number"/>
+              <input className="betAmount" value={scorecard.betAmount} onChange={this.onBetChanged} type="number"/>
               <br/>
               <button className="saveButton" onClick={this.saveScorecard}>Save Scorecard</button>
             </span>
