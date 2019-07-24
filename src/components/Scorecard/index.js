@@ -220,6 +220,7 @@ calculateScores() {
       let swingersRunningTotal = 0;
       let handicapScores = [];
       theScorecard.course.holes.forEach(function(hole, index){
+        let holeScored = true;
         let par = hole.par;
         let holeHandicap = hole.handicap;
         let players = ids.map(function(id){
@@ -231,36 +232,42 @@ calculateScores() {
         players.forEach(function(player){
           let playerHandicap = Number(player.handicap);
           let numHandicapStrokes = 0;
-          let naturalScore = Number(player.holes[index].score)
-          let handicapScore = naturalScore;
-          while(playerHandicap >= holeHandicap) {
-            numHandicapStrokes -= 1;
-            playerHandicap -= 18;
-          }
-          handicapScore += numHandicapStrokes;
-          let textHandicapScore = (numHandicapStrokes < 0 ? naturalScore + "/" + handicapScore : naturalScore);
-          player.handicapScores[index] = textHandicapScore;
-          handicapScores.push(Number(handicapScore));
-        });
-        let swingerLowHandicapScore = Math.min(handicapScores[0], handicapScores[1]);
-        let oppLowHandicapScore = Math.min(handicapScores[2], handicapScores[3]);
-        if(swingerLowHandicapScore <= oppLowHandicapScore) {
-          if(swingerLowHandicapScore === oppLowHandicapScore){
-            handicapWinner = 'Tied ' + hole.name;
+          let naturalScore = Number(player.holes[index].score);
+          if(naturalScore === 0) {
+            holeScored = false;
           } else {
-            handicapWinner = 'Swingers won ' + hole.name;
-            swingersRunningTotal += 1;
+            let handicapScore = naturalScore;
+            while(playerHandicap >= holeHandicap) {
+              numHandicapStrokes -= 1;
+              playerHandicap -= 18;
+            }
+            handicapScore += numHandicapStrokes;
+            let textHandicapScore = (numHandicapStrokes < 0 ? naturalScore + "/" + handicapScore : naturalScore);
+            player.handicapScores[index] = textHandicapScore;
+            handicapScores.push(Number(handicapScore));
           }
-        } else {
-          handicapWinner = 'Opponents won ' + hole.name;
-          swingersRunningTotal -= 1;
+        });
+        if(holeScored) {
+          let swingerLowHandicapScore = Math.min(handicapScores[0], handicapScores[1]);
+          let oppLowHandicapScore = Math.min(handicapScores[2], handicapScores[3]);
+          if(swingerLowHandicapScore <= oppLowHandicapScore) {
+            if(swingerLowHandicapScore === oppLowHandicapScore){
+              handicapWinner = 'Tied ' + hole.name;
+            } else {
+              handicapWinner = 'Swingers won ' + hole.name;
+              swingersRunningTotal += 1;
+            }
+          } else {
+            handicapWinner = 'Opponents won ' + hole.name;
+            swingersRunningTotal -= 1;
+          }
+          let swingersUnderPar = Math.max(0, par - players[0].holes[index].score) + Math.max(0, par - players[1].holes[index].score);
+          let oppsUnderPar = Math.max(0, par - players[2].holes[index].score) + Math.max(0, par - players[3].holes[index].score);
+          let strokesUnderParDifference = swingersUnderPar - oppsUnderPar;
+          swingersRunningTotal += strokesUnderParDifference;
+          let strokeResult = ( strokesUnderParDifference > 0 ? (handicapWinner + ' and Swingers gained ' + strokesUnderParDifference + ' for being under par. Swingers total: ' + swingersRunningTotal + '. '):  (handicapWinner + ' and Opponents gained ' + -strokesUnderParDifference + ' for being under par. Swingers total: ' + swingersRunningTotal + '. '));
+          tempMatchups.push(strokeResult);
         }
-        let swingersUnderPar = Math.max(0, par - players[0].holes[index].score) + Math.max(0, par - players[1].holes[index].score);
-        let oppsUnderPar = Math.max(0, par - players[2].holes[index].score) + Math.max(0, par - players[3].holes[index].score);
-        let strokesUnderParDifference = swingersUnderPar - oppsUnderPar;
-        swingersRunningTotal += strokesUnderParDifference;
-        let strokeResult = ( strokesUnderParDifference > 0 ? (handicapWinner + ' and Swingers gained ' + strokesUnderParDifference + ' for being under par. Swingers total: ' + swingersRunningTotal + '. '):  (handicapWinner + ' and Opponents gained ' + -strokesUnderParDifference + ' for being under par. Swingers total: ' + swingersRunningTotal + '. '));
-        tempMatchups.push(strokeResult);
       });
       matchup.result = tempMatchups;
       matchup.totalResult = swingersRunningTotal;
@@ -343,21 +350,7 @@ calculateScores() {
     } else {
       return (
         <div>
-          <EnterScorecard scorecard={scorecard} />
-            <span>
-              <p>Bet Amount</p>
-              <input className="betAmount" value={scorecard.betAmount} onChange={this.onBetChanged} type="number"/>
-              <br/>
-              <button className="saveButton" onClick={this.saveScorecard}>Save Scorecard</button>
-            </span>
-        </div>
-      );
-    }
-  }
-}
-
-const EnterScorecard = ({ scorecard }) => (
-  <div className="scorecard">
+          <div className="scorecard">
          <h1>Scorecard</h1>
           <table className="holes">
             <thead>
@@ -401,17 +394,17 @@ const EnterScorecard = ({ scorecard }) => (
                   <tr key={player.uid}>
                     <td>{player.username}</td>
                     <td>
-                      <input className="handicap" id={player.uid} name={player.name} value={player.handicap} onChange={Scorecard.onHandicapChange} type="number"/>
+                      <input className="handicap" id={player.uid} name={player.name} value={player.handicap} onChange={this.onHandicapChange} type="number"/>
                     </td>
                     <td>
-                      <input type="checkbox" name={player.username} onChange={Scorecard.updateSwingers} checked={!!player.swinger}/>
+                      <input type="checkbox" name={player.username} onChange={this.updateSwingers} checked={!!player.swinger}/>
                     </td>
                     <td></td>
                     {player.holes.map((item, index) => {
                       let playerHole = player.username + " " + item.name;
                       return (
-                        <td key={playerHole}>
-                          <input className="hole" id={player.uid} name={index} value={item.score} onChange={Scorecard.onScoreChange} type="number"/>
+                        <td key={playerHole} style={item.score && item.score < scorecard.course.holes[index].par ? {border: "3px solid green"}: null}>
+                          <input className="hole" id={player.uid} name={index} value={item.score} onChange={this.onScoreChange} type="number" />
                         </td>
                       )
                     })}
@@ -421,9 +414,17 @@ const EnterScorecard = ({ scorecard }) => (
             </tbody>
           </table>
         </div>
-)
-
-
+            <span>
+              <p>Bet Amount</p>
+              <input className="betAmount" value={scorecard.betAmount} onChange={this.onBetChanged} type="number"/>
+              <br/>
+              <button className="saveButton" onClick={this.saveScorecard}>Save Scorecard</button>
+            </span>
+        </div>
+      );
+    }
+  }
+}
 
 
 export default withFirebase(Scorecard);

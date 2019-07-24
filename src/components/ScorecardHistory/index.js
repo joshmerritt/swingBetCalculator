@@ -136,7 +136,7 @@ const DisplayScorecard = ({ scorecard }) => (
                     {player.handicapScores.map((item, index) => {
                       let playerHole = player.username + index + " Score" + item.name;
                       return (
-                        <td key={playerHole}>
+                        <td key={playerHole} >
                            {item} 
                         </td>
                       )
