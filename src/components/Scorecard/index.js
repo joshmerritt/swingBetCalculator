@@ -199,7 +199,7 @@ class Scorecard extends Component {
 /*
     - Calls createMatchups
     - Iterates through each matchup
-    - For every hole calculate each players natural and handicap score
+    - For every hole calculate each players handicap score
     - Compare the team's lowest handicap adjusted score to determine winner
     - Compare each team's natural strokes under par total
     - Determine result and store to results object
@@ -210,7 +210,6 @@ class Scorecard extends Component {
 
 calculateScores() {
     this.createMatchups();
-    // const theCourse = {...this.state.course};
     const theScorecard = {...this.state.scorecard};
     theScorecard.players.forEach(function(player){
       player.handicapScores = [];
@@ -274,7 +273,7 @@ calculateScores() {
       });
     });
     let newRecord = this.props.firebase.db.ref('scorecards/' + this.state.scorecard.uid);
-    newRecord.set(this.state.scorecard);
+    newRecord.set(theScorecard);
   }
 
   /*
@@ -326,7 +325,7 @@ calculateScores() {
   */
 
   render() {
-    const { scorecard, course } = this.state;
+    const { scorecard } = this.state;
     if(this.state.loading){
       if(scorecard.players && !scorecard.players[0].holes) {
         return (
@@ -343,32 +342,57 @@ calculateScores() {
       }
     } else {
       return (
-        <div className="scorecard">
+        <div>
+          <EnterScorecard scorecard={scorecard} />
+            <span>
+              <p>Bet Amount</p>
+              <input className="betAmount" value={scorecard.betAmount} onChange={this.onBetChanged} type="number"/>
+              <br/>
+              <button className="saveButton" onClick={this.saveScorecard}>Save Scorecard</button>
+            </span>
+        </div>
+      );
+    }
+  }
+}
+
+const EnterScorecard = ({ scorecard }) => (
+  <div className="scorecard">
          <h1>Scorecard</h1>
           <table className="holes">
             <thead>
               <tr>
+                <th></th>
+                <th></th>
+                <th></th>
+                <th>Hole</th>
+                {scorecard.course.holes.map((hole, index) => {
+                  return (
+                    <th>{index+1}</th>
+                  )
+                })}
+              </tr>
+              <tr>
+                <th></th>
+                <th></th>
+                <th></th>
+                <th>Par</th>
+                {scorecard.course.holes.map((hole) => {
+                  return (
+                    <th>{hole.par}</th>
+                  )
+                })}
+              </tr>
+              <tr>
                 <th>Player</th>
                 <th>Handicap</th>
                 <th>Swinger?</th>
-                <th>1</th>
-                <th>2</th>
-                <th>3</th>
-                <th>4</th>
-                <th>5</th>
-                <th>6</th>
-                <th>7</th>
-                <th>8</th>
-                <th>9</th>
-                <th>10</th>
-                <th>11</th>
-                <th>12</th>
-                <th>13</th>
-                <th>14</th>
-                <th>15</th>
-                <th>16</th>
-                <th>17</th>
-                <th>18</th>
+                <th>Rank</th>
+                {scorecard.course.holes.map((hole) => {
+                  return (
+                    <th>{hole.handicap}</th>
+                  )
+                })}
               </tr>
             </thead>
             <tbody>
@@ -377,16 +401,17 @@ calculateScores() {
                   <tr key={player.uid}>
                     <td>{player.username}</td>
                     <td>
-                      <input className="handicap" id={player.uid} name={player.name} value={player.handicap} onChange={this.onHandicapChange} type="number"/>
+                      <input className="handicap" id={player.uid} name={player.name} value={player.handicap} onChange={Scorecard.onHandicapChange} type="number"/>
                     </td>
                     <td>
-                      <input type="checkbox" name={player.username} onChange={this.updateSwingers} checked={!!player.swinger}/>
+                      <input type="checkbox" name={player.username} onChange={Scorecard.updateSwingers} checked={!!player.swinger}/>
                     </td>
+                    <td></td>
                     {player.holes.map((item, index) => {
                       let playerHole = player.username + " " + item.name;
                       return (
                         <td key={playerHole}>
-                          <input className="hole" id={player.uid} name={index} value={item.score} onChange={this.onScoreChange} type="number"/>
+                          <input className="hole" id={player.uid} name={index} value={item.score} onChange={Scorecard.onScoreChange} type="number"/>
                         </td>
                       )
                     })}
@@ -395,19 +420,9 @@ calculateScores() {
               })}
             </tbody>
           </table>
-          <div>
-             <span>
-              <p>Bet Amount</p>
-              <input className="betAmount" value={scorecard.betAmount} onChange={this.onBetChanged} type="number"/>
-              <br/>
-              <button className="saveButton" onClick={this.saveScorecard}>Save Scorecard</button>
-            </span>
-          </div>
         </div>
-      );
-    }
-  }
-}
+)
+
 
 
 

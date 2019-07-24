@@ -82,33 +82,43 @@ class ScorecardHistory extends Component {
   }
 }
 
-const DisplayScorecard = ({ scorecard, course }) => (
+const DisplayScorecard = ({ scorecard }) => (
   <div className="scorecard">
          <h1>Scorecard</h1>
           <table className="holes">
             <thead>
               <tr>
+                <th></th>
+                <th></th>
+                <th></th>
+                <th>Hole</th>
+                {scorecard.course.holes.map((hole, index) => {
+                  return (
+                    <th>{index+1}</th>
+                  )
+                })}
+              </tr>
+              <tr>
+                <th></th>
+                <th></th>
+                <th></th>
+                <th>Par</th>
+                {scorecard.course.holes.map((hole) => {
+                  return (
+                    <th>{hole.par}</th>
+                  )
+                })}
+              </tr>
+              <tr>
                 <th>Player</th>
                 <th>Handicap</th>
                 <th>Swinger?</th>
-                <th>1</th>
-                <th>2</th>
-                <th>3</th>
-                <th>4</th>
-                <th>5</th>
-                <th>6</th>
-                <th>7</th>
-                <th>8</th>
-                <th>9</th>
-                <th>10</th>
-                <th>11</th>
-                <th>12</th>
-                <th>13</th>
-                <th>14</th>
-                <th>15</th>
-                <th>16</th>
-                <th>17</th>
-                <th>18</th>
+                <th>Rank</th>
+                {scorecard.course.holes.map((hole) => {
+                  return (
+                    <th>{hole.handicap}</th>
+                  )
+                })}
               </tr>
             </thead>
             <tbody>
@@ -122,6 +132,7 @@ const DisplayScorecard = ({ scorecard, course }) => (
                     <td>
                       <input type="checkbox" name={player.username} checked={!!player.swinger} readOnly/>
                     </td>
+                    <td></td>
                     {player.handicapScores.map((item, index) => {
                       let playerHole = player.username + index + " Score" + item.name;
                       return (
