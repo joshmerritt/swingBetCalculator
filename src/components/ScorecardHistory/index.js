@@ -87,18 +87,7 @@ const DisplayScorecard = ({ scorecard }) => (
          <h1>Scorecard</h1>
           <table className="holes">
             <thead>
-              <tr>
-                <th></th>
-                <th></th>
-                <th></th>
-                <th>Hole</th>
-                {scorecard.course.holes.map((hole, index) => {
-                  return (
-                    <th>{index+1}</th>
-                  )
-                })}
-              </tr>
-              <tr>
+              <tr className="holePar">
                 <th></th>
                 <th></th>
                 <th></th>
@@ -109,14 +98,25 @@ const DisplayScorecard = ({ scorecard }) => (
                   )
                 })}
               </tr>
-              <tr>
-                <th>Player</th>
-                <th>Handicap</th>
-                <th>Swinger?</th>
+              <tr className="holeHandicap">
+                <th></th>
+                <th></th>
+                <th></th>
                 <th>Rank</th>
                 {scorecard.course.holes.map((hole) => {
                   return (
                     <th>{hole.handicap}</th>
+                  )
+                })}
+              </tr>
+              <tr className="holeNumber">
+                <th>Player</th>
+                <th>Handicap</th>
+                <th>Swinger?</th>
+                <th>Total</th>
+                {scorecard.course.holes.map((hole, index) => {
+                  return (
+                    <th>{index+1}</th>
                   )
                 })}
               </tr>
@@ -132,11 +132,11 @@ const DisplayScorecard = ({ scorecard }) => (
                     <td>
                       <input type="checkbox" name={player.username} checked={!!player.swinger} readOnly/>
                     </td>
-                    <td></td>
+                    <td>{player.totalScore}</td>
                     {player.handicapScores.map((item, index) => {
                       let playerHole = player.username + index + " Score" + item.name;
                       return (
-                        <td key={playerHole} >
+                        <td key={playerHole} style={player.scores[index] && player.scores[index] < scorecard.course.holes[index].par ? {border: "3px solid green"}: null}>
                            {item} 
                         </td>
                       )

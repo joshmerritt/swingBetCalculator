@@ -158,7 +158,11 @@ class Scorecard extends Component {
         playersIndex = index;
         return playerId === item.uid
       });
-      player.holes[holeIndex].score = value;
+      player.holes[holeIndex].score = Number(value);
+      player.totalScore = 0;
+      player.holes.forEach(function(hole, index) {
+        player.totalScore += player.holes[index].score; 
+      });
       players[playersIndex] = player;
       thisScorecard.players = players;
       this.setState({scorecard: thisScorecard});
@@ -213,6 +217,7 @@ calculateScores() {
     const theScorecard = {...this.state.scorecard};
     theScorecard.players.forEach(function(player){
       player.handicapScores = [];
+      player.scores = [];
     });
     theScorecard.matchups.forEach(function(matchup) {
       let tempMatchups = [];
@@ -236,6 +241,7 @@ calculateScores() {
           if(naturalScore === 0) {
             holeScored = false;
           } else {
+            player.scores.push(naturalScore);
             let handicapScore = naturalScore;
             while(playerHandicap >= holeHandicap) {
               numHandicapStrokes -= 1;
@@ -354,18 +360,7 @@ calculateScores() {
          <h1>Scorecard</h1>
           <table className="holes">
             <thead>
-              <tr>
-                <th></th>
-                <th></th>
-                <th></th>
-                <th>Hole</th>
-                {scorecard.course.holes.map((hole, index) => {
-                  return (
-                    <th>{index+1}</th>
-                  )
-                })}
-              </tr>
-              <tr>
+              <tr className="holePar">
                 <th></th>
                 <th></th>
                 <th></th>
@@ -376,14 +371,25 @@ calculateScores() {
                   )
                 })}
               </tr>
-              <tr>
-                <th>Player</th>
-                <th>Handicap</th>
-                <th>Swinger?</th>
+              <tr className="holeHandicap">
+                <th></th>
+                <th></th>
+                <th></th>
                 <th>Rank</th>
                 {scorecard.course.holes.map((hole) => {
                   return (
                     <th>{hole.handicap}</th>
+                  )
+                })}
+              </tr>
+              <tr>
+                <th>Player</th>
+                <th>Handicap</th>
+                <th>Swinger?</th>
+                <th>Hole</th>
+                {scorecard.course.holes.map((hole, index) => {
+                  return (
+                    <th>{index+1}</th>
                   )
                 })}
               </tr>
@@ -408,6 +414,7 @@ calculateScores() {
                         </td>
                       )
                     })}
+                    <td>{player.totalScore}</td>
                   </tr>
                 )
               })}

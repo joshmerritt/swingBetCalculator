@@ -163,6 +163,10 @@ button {
   background-color: rgba(128, 128, 128, 0.2);
 }
 
+table {
+  text-align: center;
+}
+
 .handicap {
   max-width: 50px;
 }
@@ -174,4 +178,8 @@ button {
 .betAmount {
   max-width: 50px;
   border: 1px solid grey;
+}
+
+.holePar, .holeHandicap {
+  color: darkgrey;
 }
