@@ -48,6 +48,8 @@ class Firebase {
 
   off = () => this.db.off();
 
+  db = () => this.db;
+
 }
 
 export default Firebase;

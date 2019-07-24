@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+//import update from "react-addons-update";
 import * as ROUTES from '../../constants/routes';
 import { withFirebase } from '../Firebase';
 
@@ -89,6 +90,7 @@ class Scorecard extends Component {
   */
 
   updatePlayerData() {
+    let thisScorecard = {...this.state.scorecard};
     let playersTemp = [];
     let holes = [
       {name: 'hole1', score: ''}, {name: 'hole2', score: ''}, {name: 'hole3', score: ''}, 
@@ -98,8 +100,8 @@ class Scorecard extends Component {
       {name: 'hole13', score: ''}, {name: 'hole14', score: ''}, {name: 'hole15', score: ''}, 
       {name: 'hole16', score: ''}, {name: 'hole17', score: ''}, {name: 'hole18', score: ''},
     ];
-    for (let i = 0; i < this.state.scorecard.players.length; i++) {
-      let tempPlayer = this.state.scorecard.players[i];
+    for (let i = 0; i < thisScorecard.players.length; i++) {
+      let tempPlayer = thisScorecard.players[i];
       let tempUser = this.state.users.find(player => player.username === tempPlayer);
       tempUser.holes = holes;
       if(i<2) tempUser.swinger = true;
@@ -107,13 +109,12 @@ class Scorecard extends Component {
     };
     let today = new Date();
     today = today.toString();
-    let scorecardTemp = this.props.firebase.scorecard(this.state.scorecard.uid);
+    let scorecardTemp = this.props.firebase.scorecard(thisScorecard.uid);
     scorecardTemp.set({
       players: playersTemp,
       dateOfRound: today,
       betAmount: 1,
-    });
-    this.setState({loading: false});
+    });   
   }
 
 /*
@@ -132,7 +133,9 @@ class Scorecard extends Component {
       });
       player.handicap = Number(event.target.value);
       players[playersIndex] = player;
-      this.setState({players: players});
+      let thisScorecard = this.state.scorecard;
+      thisScorecard.players = players;
+      this.setState({scorecard: thisScorecard});
     };
   }
 
@@ -143,32 +146,21 @@ class Scorecard extends Component {
 
   onScoreChange = event => {
     const value = event.target.value;
-    let tempValues = event.target.id.split(' ');
-    const nameLength = tempValues.length - 1;
-    const holeName = tempValues[nameLength];
-    let playerName = '';
-    for(let i=0; i < nameLength; i++) {
-      playerName += tempValues[i];
-      if(i < (nameLength -1)) playerName += " ";
-    }
+    const holeIndex = event.target.name;
+    const playerId = event.target.id;
+    let thisScorecard = {...this.state.scorecard};
     if(value >= 0) {
-      let players = this.state.scorecard.players;
-      let playersIndex = '';
+      let players = thisScorecard.players;
+      let playersIndex = null;
       let player = players.find(function(item, index) {
         playersIndex = index;
-        return playerName === item.username
+        return playerId === item.uid
       });
-      let holes = player.holes;
-      let holeIndex = '';
-      holes.find(function(item, index){
-        holeIndex = index;
-        return holeName === item.name
-      })
       player.holes[holeIndex].score = value;
       players[playersIndex] = player;
-      this.setState({players: players});
+      thisScorecard.players = players;
+      this.setState({scorecard: thisScorecard});
     };
-
   }
 
 /*
@@ -214,10 +206,13 @@ class Scorecard extends Component {
     - Save to database
 */
 
-  calculateScores() {
+calculateScores() {
     this.createMatchups();
     const theCourse = this.state.course;
-    const theScorecard = this.state.scorecard;
+    const theScorecard = {...this.state.scorecard};
+    theScorecard.players.forEach(function(player){
+      player.handicapScores = [];
+    });
     theScorecard.matchups.forEach(function(matchup) {
       let tempMatchups = [];
       let ids = matchup.players;
@@ -229,20 +224,25 @@ class Scorecard extends Component {
           console.log('id', id);
           return theScorecard.players.find(function(player){
             console.log('player', player);
-            console.log('players', players);
             return player.uid === id.uid
           });
         });
+        console.log('players', players);
         let handicapScores = [];
         let handicapWinner;
         players.forEach(function(player){
           let playerHandicap = Number(player.handicap);
           let numHandicapStrokes = 0;
+          let handicapScore = Number(player.holes[index].score);
+          console.log('handicapScore', handicapScore);
           while(playerHandicap >= holeHandicap) {
             numHandicapStrokes -= 1;
             playerHandicap -= 18;
           }
-          handicapScores.push(Number(player.holes[index].score) + numHandicapStrokes);
+          console.log('numHandicapStrokes', numHandicapStrokes);
+          handicapScore += numHandicapStrokes;
+          player.handicapScores.push(Number(handicapScore));
+          handicapScores.push(Number(handicapScore));
         });
         let swingerLowHandicapScore = Math.min(handicapScores[0], handicapScores[1]);
         let oppLowHandicapScore = Math.min(handicapScores[2], handicapScores[3]);
@@ -386,7 +386,7 @@ class Scorecard extends Component {
                       let playerHole = player.username + " " + item.name;
                       return (
                         <td key={playerHole}>
-                          <input className="hole" id={playerHole} name={player.username} value={item.score} onChange={this.onScoreChange} type="number"/>
+                          <input className="hole" id={player.uid} name={index} value={item.score} onChange={this.onScoreChange} type="number"/>
                         </td>
                       )
                     })}
