@@ -91,6 +91,7 @@ class Scorecard extends Component {
 
   updatePlayerData() {
     let thisScorecard = {...this.state.scorecard};
+    let thisCourse = {...this.state.course};
     let playersTemp = [];
     let holes = [
       {name: 'hole1', score: ''}, {name: 'hole2', score: ''}, {name: 'hole3', score: ''}, 
@@ -114,6 +115,7 @@ class Scorecard extends Component {
       players: playersTemp,
       dateOfRound: today,
       betAmount: 1,
+      course: thisCourse,
     });   
   }
 

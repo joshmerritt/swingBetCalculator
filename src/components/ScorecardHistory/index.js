@@ -82,7 +82,7 @@ class ScorecardHistory extends Component {
   }
 }
 
-const DisplayScorecard = ({ scorecard }) => (
+const DisplayScorecard = ({ scorecard, course }) => (
   <div className="scorecard">
          <h1>Scorecard</h1>
           <table className="holes">
