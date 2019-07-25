@@ -33,7 +33,8 @@ class ScorecardHistory extends Component {
         ...scorecardObject[key],
         uid: key,
       }));
-      let lastScorecard = scorecardList[scorecardList.length-1];
+      scorecardList.reverse();
+      let lastScorecard = scorecardList[0];
       this.setState({
         scorecardList: scorecardList,
         scorecard: lastScorecard,

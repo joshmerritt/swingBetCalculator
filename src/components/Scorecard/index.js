@@ -386,7 +386,7 @@ calculateScores() {
                 <th>Player</th>
                 <th>Handicap</th>
                 <th>Swinger?</th>
-                <th>Hole</th>
+                <th>Total</th>
                 {scorecard.course.holes.map((hole, index) => {
                   return (
                     <th>{index+1}</th>
@@ -398,23 +398,22 @@ calculateScores() {
               {scorecard.players.map((player) => {
                 return (
                   <tr key={player.uid}>
-                    <td>{player.username}</td>
+                    <td className="playerName">{player.username}</td>
                     <td>
-                      <input className="handicap" id={player.uid} name={player.name} value={player.handicap} onChange={this.onHandicapChange} type="number"/>
+                      <input className="handicap" id={player.uid} name={player.name} value={player.handicap} onChange={this.onHandicapChange} type="text"/>
                     </td>
                     <td>
                       <input type="checkbox" name={player.username} onChange={this.updateSwingers} checked={!!player.swinger}/>
                     </td>
-                    <td></td>
+                    <td>{player.totalScore}</td>
                     {player.holes.map((item, index) => {
                       let playerHole = player.username + " " + item.name;
                       return (
                         <td key={playerHole} style={item.score && item.score < scorecard.course.holes[index].par ? {border: "3px solid green"}: null}>
-                          <input className="hole" id={player.uid} name={index} value={item.score} onChange={this.onScoreChange} type="number" />
+                          <input className="hole" id={player.uid} name={index} value={item.score} onChange={this.onScoreChange} type="text" />
                         </td>
                       )
                     })}
-                    <td>{player.totalScore}</td>
                   </tr>
                 )
               })}

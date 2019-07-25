@@ -167,6 +167,15 @@ table {
   text-align: center;
 }
 
+input {
+  width: 75%;
+  text-align: center;
+}
+
+.playerName {
+  width: 15%;
+}
+
 .handicap {
   max-width: 50px;
 }
