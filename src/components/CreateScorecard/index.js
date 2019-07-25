@@ -157,7 +157,7 @@ class CreateScorecard extends Component {
         <h4>Enter Player Names</h4>
         
         <div className='AutoCompleteText'>
-            <input value={text} onChange={this.onTextChanged} type='text' /> 
+            <input className='addPlayer' value={text} onChange={this.onTextChanged} type='text' /> 
             {this.renderSuggestions()}
         </div>
         <br/>

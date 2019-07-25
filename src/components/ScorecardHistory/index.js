@@ -95,7 +95,7 @@ const DisplayScorecard = ({ scorecard }) => (
                 <th>Par</th>
                 {scorecard.course.holes.map((hole) => {
                   return (
-                    <th>{hole.par}</th>
+                    <th key={hole.name + " par"}>{hole.par}</th>
                   )
                 })}
               </tr>
@@ -106,7 +106,7 @@ const DisplayScorecard = ({ scorecard }) => (
                 <th>Rank</th>
                 {scorecard.course.holes.map((hole) => {
                   return (
-                    <th>{hole.handicap}</th>
+                    <th key={hole.name + " handicap"}>{hole.handicap}</th>
                   )
                 })}
               </tr>
@@ -117,7 +117,7 @@ const DisplayScorecard = ({ scorecard }) => (
                 <th>Total</th>
                 {scorecard.course.holes.map((hole, index) => {
                   return (
-                    <th>{index+1}</th>
+                    <th key={hole.name}>{index+1}</th>
                   )
                 })}
               </tr>
@@ -134,14 +134,14 @@ const DisplayScorecard = ({ scorecard }) => (
                       <input type="checkbox" name={player.username} checked={!!player.swinger} readOnly/>
                     </td>
                     <td>{player.totalScore}</td>
-                    {player.handicapScores.map((item, index) => {
+                    {player.handicapScores ? player.handicapScores.map((item, index) => {
                       let playerHole = player.username + index + " Score" + item.name;
                       return (
                         <td key={playerHole} style={player.scores[index] && player.scores[index] < scorecard.course.holes[index].par ? {border: "3px solid green"}: null}>
                            {item} 
                         </td>
                       )
-                    })}
+                    }): <td>N/A</td>}
                   </tr>
                 )
               })}
@@ -175,11 +175,11 @@ const ResultsList = ({ scorecard }) => (
           <strong> Opponents: </strong> {matchup.players[2].username + ' & ' + matchup.players[3].username}
         </li>
         <ul>
-          {matchup.result.map(hole => (
+          {matchup.result ? matchup.result.map(hole => (
             <li key={hole + matchup.players[2].uid + matchup.players[3].uid}>
               {hole}
             </li>
-          ))}
+          )): <h3>Incomplete Matchup Results</h3>}
         </ul>
         <br/>
       </ul>

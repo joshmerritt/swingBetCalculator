@@ -95,6 +95,10 @@ li h3 {
   padding: 15px;
 }
 
+h4 {
+  margin: 0 !important;
+}
+
 ul {
   list-style-type: none;
   text-align: left;
@@ -146,7 +150,6 @@ button {
   text-align: left;
   margin: 0;
   padding: 0;
-  border-top: 1px solid grey;
 }
 
 .AutoCompleteText ul::before{
@@ -163,13 +166,22 @@ button {
   background-color: rgba(128, 128, 128, 0.2);
 }
 
+th {
+  font-size: 0.7em;
+}
+
 table {
   text-align: center;
 }
 
 input {
-  width: 75%;
+  width: 50%;
   text-align: center;
+  margin: auto;
+}
+
+.addPlayer {
+  text-align: left;
 }
 
 .playerName {
@@ -187,8 +199,13 @@ input {
 .betAmount {
   max-width: 50px;
   border: 1px solid grey;
+  margin: 0;
 }
 
 .holePar, .holeHandicap {
   color: darkgrey;
+}
+
+p {
+  margin: 0.2em;
 }

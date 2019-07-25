@@ -27,6 +27,7 @@ class Scorecard extends Component {
   this.saveScorecard = this.saveScorecard.bind(this);
   this.updateSwingers = this.updateSwingers.bind(this);
   this.onBetChanged = this.onBetChanged.bind(this);
+  this.updateSelectedScorecard = this.updateSelectedScorecard.bind(this);
   }
 
 /*
@@ -50,8 +51,10 @@ class Scorecard extends Component {
           ...scorecardObject[key],
           uid: key,
         }));
-        let lastScorecard = scorecardList[scorecardList.length-1];
+        scorecardList.reverse();
+        let lastScorecard = scorecardList[0];
         this.setState({
+          scorecardList: scorecardList,
           scorecard: lastScorecard,
           players: lastScorecard.players,
         });
@@ -176,7 +179,8 @@ class Scorecard extends Component {
   
   updateSwingers = event => {
     const playerName = event.target.name;
-    let players = this.state.scorecard.players;
+    let thisScorecard = {...this.state.scorecard};
+    let players = thisScorecard.players;
     let playersIndex = '';
     let player = players.find(function(item, index) {
       playersIndex = index;
@@ -184,7 +188,8 @@ class Scorecard extends Component {
     });
     player.swinger = !player.swinger;
     players[playersIndex] = player;
-    this.setState({players: players});
+    thisScorecard.players = players
+    this.setState({scorecard: thisScorecard});
   }
 
 /*
@@ -197,7 +202,10 @@ class Scorecard extends Component {
     newRecord.set(this.state.scorecard);
     event.preventDefault();
     this.calculateScores();
-    this.props.history.push(ROUTES.SCORECARD_HISTORY);
+    setTimeout(() => {
+      this.props.history.push(ROUTES.SCORECARD_HISTORY);
+    },3000);
+
   }
 
 /*
@@ -214,79 +222,82 @@ class Scorecard extends Component {
 
 calculateScores() {
     this.createMatchups();
-    const theScorecard = {...this.state.scorecard};
-    theScorecard.players.forEach(function(player){
-      player.handicapScores = [];
-      player.scores = [];
-    });
-    theScorecard.matchups.forEach(function(matchup) {
-      let tempMatchups = [];
-      let ids = matchup.players;
-      let swingersRunningTotal = 0;
-      let handicapScores = [];
-      theScorecard.course.holes.forEach(function(hole, index){
-        let holeScored = true;
-        let par = hole.par;
-        let holeHandicap = hole.handicap;
-        let players = ids.map(function(id){
-          return theScorecard.players.find(function(player){
-            return player.uid === id.uid
+    setTimeout(() => {
+      const theScorecard = {...this.state.scorecard};
+      theScorecard.players.forEach(function(player){
+        player.handicapScores = [];
+        player.scores = [];
+      });
+      theScorecard.matchups.forEach(function(matchup) {
+        let tempMatchups = [];
+        let ids = matchup.players;
+        let swingersRunningTotal = 0;
+        theScorecard.course.holes.forEach(function(hole, index){
+          let handicapScores = [];
+          let holeScored = true;
+          let par = hole.par;
+          let holeHandicap = hole.handicap;
+          let players = ids.map(function(id){
+            return theScorecard.players.find(function(player){
+              return player.uid === id.uid
+            });
           });
-        });
-        let handicapWinner;
-        players.forEach(function(player){
-          let playerHandicap = Number(player.handicap);
-          let numHandicapStrokes = 0;
-          let naturalScore = Number(player.holes[index].score);
-          if(naturalScore === 0) {
-            holeScored = false;
-          } else {
-            player.scores.push(naturalScore);
-            let handicapScore = naturalScore;
-            while(playerHandicap >= holeHandicap) {
-              numHandicapStrokes -= 1;
-              playerHandicap -= 18;
-            }
-            handicapScore += numHandicapStrokes;
-            let textHandicapScore = (numHandicapStrokes < 0 ? naturalScore + "/" + handicapScore : naturalScore);
-            player.handicapScores[index] = textHandicapScore;
-            handicapScores.push(Number(handicapScore));
-          }
-        });
-        if(holeScored) {
-          let swingerLowHandicapScore = Math.min(handicapScores[0], handicapScores[1]);
-          let oppLowHandicapScore = Math.min(handicapScores[2], handicapScores[3]);
-          if(swingerLowHandicapScore <= oppLowHandicapScore) {
-            if(swingerLowHandicapScore === oppLowHandicapScore){
-              handicapWinner = 'Tied ' + hole.name;
+          let handicapWinner;
+          players.forEach(function(player){
+            let playerHandicap = Number(player.handicap);
+            let numHandicapStrokes = 0;
+            let naturalScore = Number(player.holes[index].score);
+            if(naturalScore === 0) {
+              holeScored = false;
             } else {
-              handicapWinner = 'Swingers won ' + hole.name;
-              swingersRunningTotal += 1;
+              player.scores.push(naturalScore);
+              let handicapScore = naturalScore;
+              while(playerHandicap >= holeHandicap) {
+                numHandicapStrokes -= 1;
+                playerHandicap -= 18;
+              }
+              handicapScore += numHandicapStrokes;
+              let textHandicapScore = (numHandicapStrokes < 0 ? naturalScore + "/" + handicapScore : naturalScore);
+              player.handicapScores[index] = textHandicapScore;
+              handicapScores.push(Number(handicapScore));
             }
-          } else {
-            handicapWinner = 'Opponents won ' + hole.name;
-            swingersRunningTotal -= 1;
+          });
+          if(holeScored) {
+            let swingerLowHandicapScore = Math.min(handicapScores[0], handicapScores[1]);
+            let oppLowHandicapScore = Math.min(handicapScores[2], handicapScores[3]);
+            console.log('handicapScores', handicapScores);
+            if(swingerLowHandicapScore <= oppLowHandicapScore) {
+              if(swingerLowHandicapScore === oppLowHandicapScore){
+                handicapWinner = 'Tied ' + hole.name;
+              } else {
+                handicapWinner = 'Swingers won ' + hole.name;
+                swingersRunningTotal += 1;
+              }
+            } else {
+              handicapWinner = 'Opponents won ' + hole.name;
+              swingersRunningTotal -= 1;
+            }
+            let swingersUnderPar = Math.max(0, par - players[0].holes[index].score) + Math.max(0, par - players[1].holes[index].score);
+            let oppsUnderPar = Math.max(0, par - players[2].holes[index].score) + Math.max(0, par - players[3].holes[index].score);
+            let strokesUnderParDifference = swingersUnderPar - oppsUnderPar;
+            swingersRunningTotal += strokesUnderParDifference;
+            let strokeResult = ( strokesUnderParDifference > 0 ? (handicapWinner + ' and Swingers gained ' + strokesUnderParDifference + ' for being under par. Swingers total: ' + swingersRunningTotal + '. '):  (handicapWinner + ' and Opponents gained ' + -strokesUnderParDifference + ' for being under par. Swingers total: ' + swingersRunningTotal + '. '));
+            tempMatchups.push(strokeResult);
           }
-          let swingersUnderPar = Math.max(0, par - players[0].holes[index].score) + Math.max(0, par - players[1].holes[index].score);
-          let oppsUnderPar = Math.max(0, par - players[2].holes[index].score) + Math.max(0, par - players[3].holes[index].score);
-          let strokesUnderParDifference = swingersUnderPar - oppsUnderPar;
-          swingersRunningTotal += strokesUnderParDifference;
-          let strokeResult = ( strokesUnderParDifference > 0 ? (handicapWinner + ' and Swingers gained ' + strokesUnderParDifference + ' for being under par. Swingers total: ' + swingersRunningTotal + '. '):  (handicapWinner + ' and Opponents gained ' + -strokesUnderParDifference + ' for being under par. Swingers total: ' + swingersRunningTotal + '. '));
-          tempMatchups.push(strokeResult);
-        }
+        });
+        matchup.result = tempMatchups;
+        matchup.totalResult = swingersRunningTotal;
+        theScorecard.players.forEach(function(player) {
+          if(player.uid === matchup.players[0].uid || player.uid === matchup.players[1].uid) {
+            player.totalResult += (swingersRunningTotal);
+          } else if(player.uid === matchup.players[2].uid || player.uid === matchup.players[3].uid) {
+            player.totalResult -= (swingersRunningTotal);
+          }
+        });
       });
-      matchup.result = tempMatchups;
-      matchup.totalResult = swingersRunningTotal;
-      theScorecard.players.forEach(function(player) {
-        if(player.uid === matchup.players[0].uid || player.uid === matchup.players[1].uid) {
-          player.totalResult += (swingersRunningTotal);
-        } else if(player.uid === matchup.players[2].uid || player.uid === matchup.players[3].uid) {
-          player.totalResult -= (swingersRunningTotal);
-        }
-      });
-    });
-    let newRecord = this.props.firebase.db.ref('scorecards/' + this.state.scorecard.uid);
-    newRecord.set(theScorecard);
+      let newRecord = this.props.firebase.db.ref('scorecards/' + this.state.scorecard.uid);
+      newRecord.set(theScorecard);
+    }, 3000);
   }
 
   /*
@@ -328,6 +339,14 @@ calculateScores() {
     scorecard.betAmount = newBetAmount;
     this.setState({scorecard: scorecard});
   }
+
+  /*
+      - Update the scorecard being scored
+  */
+
+  updateSelectedScorecard(event) {
+    this.setState({scorecard: this.state.scorecardList[event.target.value]})
+  }
   
   /*
       - Display loading if data not loaded yet
@@ -338,7 +357,7 @@ calculateScores() {
   */
 
   render() {
-    const { scorecard } = this.state;
+    const { scorecard, scorecardList } = this.state;
     if(this.state.loading){
       if(scorecard.players && !scorecard.players[0].holes) {
         return (
@@ -356,8 +375,15 @@ calculateScores() {
     } else {
       return (
         <div>
+          <h4>Select Scorecard</h4>
+          <select className="scorecardSelect" onChange={this.updateSelectedScorecard}>
+            {scorecardList.map((option, index) =>
+              <option key={option.dateOfRound} value={index}>
+                {option.dateOfRound}
+              </option>
+              )}
+          </select>
           <div className="scorecard">
-         <h1>Scorecard</h1>
           <table className="holes">
             <thead>
               <tr className="holePar">
@@ -367,7 +393,7 @@ calculateScores() {
                 <th>Par</th>
                 {scorecard.course.holes.map((hole) => {
                   return (
-                    <th>{hole.par}</th>
+                    <th key={hole.name + "par"}>{hole.par}</th>
                   )
                 })}
               </tr>
@@ -378,7 +404,7 @@ calculateScores() {
                 <th>Rank</th>
                 {scorecard.course.holes.map((hole) => {
                   return (
-                    <th>{hole.handicap}</th>
+                    <th key={hole.name + "handicap"}>{hole.handicap}</th>
                   )
                 })}
               </tr>
@@ -389,7 +415,7 @@ calculateScores() {
                 <th>Total</th>
                 {scorecard.course.holes.map((hole, index) => {
                   return (
-                    <th>{index+1}</th>
+                    <th key={hole.name}>{index+1}</th>
                   )
                 })}
               </tr>
