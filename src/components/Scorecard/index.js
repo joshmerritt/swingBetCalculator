@@ -252,7 +252,7 @@ calculateScores() {
             if(naturalScore === 0) {
               holeScored = false;
             } else {
-              player.scores.push(naturalScore);
+              if (!player.scores[index]) player.scores[index] = naturalScore;
               let handicapScore = naturalScore;
               while(playerHandicap >= holeHandicap) {
                 numHandicapStrokes -= 1;
