@@ -20,6 +20,7 @@ class Scorecard extends Component {
     scorecard: [],
     course: [],
     loading: true,
+    savingScores: false,
   };
   this.updatePlayerData = this.updatePlayerData.bind(this);
   this.onHandicapChange = this.onHandicapChange.bind(this);
@@ -197,6 +198,7 @@ class Scorecard extends Component {
 */ 
 
   saveScorecard = event => {
+    this.setState({savingScores: true});
     const currentScorecardKey = this.state.scorecard.uid;
     let newRecord = this.props.firebase.db.ref('scorecards/' + currentScorecardKey);
     newRecord.set(this.state.scorecard);
@@ -265,7 +267,6 @@ calculateScores() {
           if(holeScored) {
             let swingerLowHandicapScore = Math.min(handicapScores[0], handicapScores[1]);
             let oppLowHandicapScore = Math.min(handicapScores[2], handicapScores[3]);
-            console.log('handicapScores', handicapScores);
             if(swingerLowHandicapScore <= oppLowHandicapScore) {
               if(swingerLowHandicapScore === oppLowHandicapScore){
                 handicapWinner = 'Tied ' + hole.name;
@@ -450,7 +451,7 @@ calculateScores() {
               <p>Bet Amount</p>
               <input className="betAmount" value={scorecard.betAmount} onChange={this.onBetChanged} type="number"/>
               <br/>
-              <button className="saveButton" onClick={this.saveScorecard}>Save Scorecard</button>
+              <button className="saveButton" onClick={this.saveScorecard} disabled={this.state.savingScores}>Save Scorecard</button>
             </span>
         </div>
       );
