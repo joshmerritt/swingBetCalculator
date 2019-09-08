@@ -120,6 +120,7 @@ class Scorecard extends Component {
       dateOfRound: today,
       betAmount: 1,
       course: thisCourse,
+      validRound: true,
     });   
   }
 
@@ -251,6 +252,7 @@ calculateScores() {
             let naturalScore = Number(player.holes[index].score);
             if(naturalScore === 0) {
               holeScored = false;
+              theScorecard.validRound = false;
             } else {
               if (!player.scores[index]) player.scores[index] = naturalScore;
               let handicapScore = naturalScore;
