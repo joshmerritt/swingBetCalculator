@@ -13,6 +13,7 @@ class ScorecardHistory extends Component {
       users: [],
     };
     this.updateSelectedScorecard = this.updateSelectedScorecard.bind(this);
+    this.onValidRoundUpdate = this.onValidRoundUpdate.bind(this);
   }
 
   componentDidMount() {
@@ -55,6 +56,15 @@ class ScorecardHistory extends Component {
     this.setState({scorecard: this.state.scorecardList[event.target.value]})
   }
 
+  onValidRoundUpdate() {
+    let scorecard = this.state.scorecard;
+    scorecard.validRound = !scorecard.validRound;
+    this.setState({scorecard: scorecard});
+    const currentScorecardKey = this.state.scorecard.uid;
+    let newRecord = this.props.firebase.db.ref('scorecards/' + currentScorecardKey);
+    newRecord.set(this.state.scorecard);
+  }
+
   render() {
     const { scorecard, loading, scorecardList } = this.state;
     if(scorecard && scorecardList && !loading){
@@ -68,7 +78,8 @@ class ScorecardHistory extends Component {
               </option>
               )}
           </select>
-        <h2>Results for round on</h2>
+          <thead>Include in stats? <input type="checkbox" onChange={this.onValidRoundUpdate} checked={!!scorecard.validRound}/></thead>      
+        <h3>Results for round on</h3>
         <ResultsList scorecard={scorecard} />
         </div>
       )

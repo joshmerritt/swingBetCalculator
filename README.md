@@ -1,41 +1,35 @@
-# react-firebase-authentication
 
-[![Build Status](https://travis-ci.org/taming-the-state-in-react/react-firebase-authentication.svg?branch=master)](https://travis-ci.org/taming-the-state-in-react/react-firebase-authentication) [![Slack](https://slack-the-road-to-learn-react.wieruch.com/badge.svg)](https://slack-the-road-to-learn-react.wieruch.com/) [![Greenkeeper badge](https://badges.greenkeeper.io/taming-the-state-in-react/react-firebase-authentication.svg)](https://greenkeeper.io/)
 
-* Found in [Taming the State in React](https://roadtoreact.com/course-details?courseId=TAMING_THE_STATE)
-* [Live](https://react-firebase-authentication.wieruch.com/)
-* [Tutorial](https://www.robinwieruch.de/complete-firebase-authentication-react-tutorial/)
 
-## Features
 
-* uses:
-  * only React (create-react-app)
-  * firebase 5
-  * react-router 4
-  * no Redux/MobX
-    * [Redux Version](https://github.com/taming-the-state-in-react/react-redux-firebase-authentication)
-    * [MobX Version](https://github.com/taming-the-state-in-react/react-mobx-firebase-authentication)
-  * [React's 16.3 context API](https://reactjs.org/blog/2018/03/29/react-v-16-3.html)
-* features:
-  * Sign In
-  * Sign Up
-  * Sign Out
-  * Password Forget
-  * Password Change
-  * Protected Routes with Authorization
-  * Database: Users
+# Swing Bet Project Plan #
 
-## Installation
+### Goal ###
+Create a calculator that allows a user to enter a round of scores for the golf betting game “Swing Bet”
 
-* `git clone git@github.com:taming-the-state-in-react/react-firebase-authentication.git`
-* `cd react-firebase-authentication`
-* `npm install`
-* `npm start`
-* visit http://localhost:3000/
-* Use your own Firebase Credentials
+### Overview ###
 
-### Use your own Firebase Credentials
+Build an app that is accessible via the internet which allows for a calculation of the result of a golf game “Swing Bet.” For the given course, users can enter hole by hole scores for any number of players, two of which are designated “Swingers.” The app then creates every possible two player combination of non-swingers and calculates their score versus the swingers. The final scores are displayed, with hole-by-hole by team breakdowns, and the end total is calculated for each player. The default is $1 bet, but different ‘per stroke’ amount can be specified. 
+Scoring Rules
+The team with the lowest handicap-adjusted score is awarded 1 point for winning a hole, regardless of the score they won with.
+If any of the players on a team make a score of less than par (a natural score, not handicap adjusted), that team is awarded 1 point for each stroke under par a player on that team scores, regardless if they win the hole or not. (birdie=1 point, eagle=2 points, albatross=3 points) 
+Note: If a player is “stroking” (receiving a reduction in score based on handicap) that player can only get the points for his natural score BUT the handicap stroke can allow the player to win or tie the hole.
 
-* visit https://firebase.google.com/ and create a Firebase App
-* copy and paste your Credentials from your Firebase App into src/firebase/firebase.js
-* activate Email/Password Sign-In Method in your Firebase App
+### Requirements ###
+- Accepts golf course layout, including par and hole handicap ratings
+- Accepts a player with a handicap
+- Accepts any number of players
+- Accepts hole by hole scores for each player
+- Indicates which players are the “Swingers”
+- Creates teams for each permutation of non-swinger players
+- Calculates a score for each team (as defined in 6) versus the swingers for each hole
+- Calculates running total
+- Displays hole by hole scoring for every matchup
+- Saves records of the rounds
+- Landing page with links to enter a new scorecard and see previous scorecards
+
+### Nice to haves ###
+- Stores a player and default handicap
+- Login
+- Metrics for player average and ytd winning$
+

@@ -230,6 +230,7 @@ calculateScores() {
       theScorecard.players.forEach(function(player){
         player.handicapScores = [];
         player.scores = [];
+        player.completeRound = true;
       });
       theScorecard.matchups.forEach(function(matchup) {
         let tempMatchups = [];
@@ -253,6 +254,7 @@ calculateScores() {
             if(naturalScore === 0) {
               holeScored = false;
               theScorecard.validRound = false;
+              player.completeRound = false;
             } else {
               if (!player.scores[index]) player.scores[index] = naturalScore;
               let handicapScore = naturalScore;
