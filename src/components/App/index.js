@@ -12,10 +12,11 @@ import AccountPage from '../Account';
 import AdminPage from '../Admin';
 import Scorecard from '../Scorecard';
 import CreateScorecard from '../CreateScorecard';
+import ScorecardHistory from '../ScorecardHistory';
+import Stats from '../Stats';
 
 import * as ROUTES from '../../constants/routes';
 import { withAuthentication } from '../Session';
-import ScorecardHistory from '../ScorecardHistory';
 
 const App = () => (
   <Router>
@@ -38,6 +39,7 @@ const App = () => (
       <Route exact path={ROUTES.SCORECARD} component={Scorecard} />
       <Route exact path={ROUTES.CREATE_SCORECARD} component={CreateScorecard} />
       <Route exact path={ROUTES.SCORECARD_HISTORY} component={ScorecardHistory} />
+      <Route exact path={ROUTES.STATS} component={Stats} />
     </div>
   </Router>
 );

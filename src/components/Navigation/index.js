@@ -28,6 +28,9 @@ const NavigationAuth = () => (
       <Link to={ROUTES.SCORECARD_HISTORY}>Round Results</Link>
     </li>
     <li>
+      <Link to={ROUTES.STATS}>Player Stats</Link>
+    </li>
+    <li>
       <Link to={ROUTES.ACCOUNT}>Update Account</Link>
     </li>
     <li>
