@@ -4,7 +4,7 @@
   "private": true,
   "dependencies": {
     "firebase": "^5.11.1",
-    "firebase-tools": "^7.1.1",
+    "firebase-tools": "^13.6.0",
     "react": "^16.8.6",
     "react-addons-update": "^15.6.2",
     "react-dom": "^16.8.6",
